@@ -1,0 +1,221 @@
+<div class="container-fluid">
+    <div *ngIf="errors.length>0">
+        <div *ngFor="let error of errors;let i=index">
+            <ngb-alert (close)="errors=[]" type="danger" [dismissible]="true">{{
+                error.libelle }}
+            </ngb-alert>
+        </div>
+    </div>
+    <!-- start page title -->
+    <app-page-title title="Add Product" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+    <!-- end page title -->
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+
+                    <h4 class="card-title">Basic Information</h4>
+                    <p class="card-title-desc">Fill all information below</p>
+
+                    <form [formGroup]="formProduct" (ngSubmit)="productOnSubmit()">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="title">Product Name</label>
+                                    <input id="title" formControlName="title" type="text" class="form-control"
+                                           [ngClass]="{ 'is-invalid': fpsubmitted && fp.title.errors }"
+                                    >
+                                    <div *ngIf="fpsubmitted && fp.title.errors" class="invalid-feedback">
+                                        <div *ngIf="fp.title.errors.required">Name is required</div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="pricePromo">Promo Price</label>
+                                    <input id="pricePromo" formControlName="pricePromo" type="text"
+                                           class="form-control"
+                                           [ngClass]="{ 'is-invalid': fpsubmitted && fp.pricePromo.errors }"
+                                    >
+                                    <div *ngIf="fpsubmitted && fp.pricePromo.errors" class="invalid-feedback">
+                                        <div *ngIf="fp.pricePromo.errors.badFormatPrice">
+                                            Please enter with one decimal point (.) without thousand separators
+                                        </div>
+                                        <div *ngIf="fp.pricePromo.errors.bigNumber">It's a big price :)</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="price">Price</label>
+                                    <input id="price" formControlName="price" type="text" class="form-control"
+                                           [ngClass]="{ 'is-invalid': fpsubmitted && fp.price.errors }"
+                                    >
+                                    <div *ngIf="fpsubmitted && fp.price.errors" class="invalid-feedback">
+                                        <div *ngIf="fp.price.errors.required">Price is required</div>
+                                        <div *ngIf="fp.price.errors.badFormatPrice">
+                                            Please enter with one decimal point (.) without thousand separators
+                                        </div>
+                                        <div *ngIf="fp.price.errors.bigNumber">It's a big price :)</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="shippingPrice">Shipping Price</label>
+                                    <input id="shippingPrice" formControlName="shippingPrice" type="text"
+                                           class="form-control"
+                                           [ngClass]="{ 'is-invalid': fpsubmitted && fp.shippingPrice.errors }"
+                                    >
+                                    <div *ngIf="fpsubmitted && fp.shippingPrice.errors" class="invalid-feedback">
+                                        <div *ngIf="fp.shippingPrice.errors.badFormatPrice">
+                                            Please enter with one decimal point (.) without thousand separators
+                                        </div>
+                                        <div *ngIf="fp.shippingPrice.errors.bigNumber">It's a big price :)</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="quantityStock">Stock</label>
+                                    <input id="quantityStock" formControlName="quantityStock" type="number"
+                                           class="form-control"
+                                           [ngClass]="{ 'is-invalid': fpsubmitted && fp.quantityStock.errors }"
+                                    >
+                                    <div *ngIf="fpsubmitted && fp.quantityStock.errors" class="invalid-feedback">
+                                        <div *ngIf="fp.quantityStock.errors.required">Stock is required</div>
+                                        <div *ngIf="fp.quantityStock.errors.pattern">
+                                            Please enter a valid integer number
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+
+                                <div class="form-group">
+                                    <label class="control-label">Parent Category</label>
+                                    <ng-select bindLabel="name"
+                                               formControlName="superCategory"
+                                               (change)="onChangeSuperCategory()"
+                                               [clearable]="false" [items]="superCategories | async"
+
+                                    ></ng-select>
+                                    <!--<div *ngIf="fpsubmitted && fp.superCategory.errors" class="invalid-feedback">
+                                        <div *ngIf="fp.superCategory.errors.required">Parent Category is required</div>
+                                    </div>-->
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Category</label>
+                                    <ng-select bindLabel="name"
+                                               formControlName="category"
+                                               [multiple]="true"
+                                               [items]="categories | async"
+                                    ></ng-select>
+                                    <!--<div *ngIf="fpsubmitted && fp.category.errors" class="invalid-feedback">
+                                        <div *ngIf="fp.category.errors.required">Category is required</div>
+                                    </div>-->
+                                </div>
+                                <!--<div class="form-group">
+                                    <label for="productdesc">Product Description</label>
+                                    <textarea class="form-control" id="productdesc" rows="5"></textarea>
+                                </div>-->
+
+                                <div class="form-group">
+                                    <label class="control-label">Unit</label>
+                                    <ng-select formControlName="unit" [items]="units"
+                                               [ngClass]="{ 'is-invalid': fpsubmitted && fp.unit.errors }"
+                                    ></ng-select>
+                                    <div *ngIf="fpsubmitted && fp.unit.errors" class="invalid-feedback">
+                                        <div *ngIf="fp.unit.errors.required">Please select unit type</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Store</label>
+                                    <ng-select bindLabel="name"
+                                               formControlName="store"
+                                               [items]="stores | async"
+
+                                               (change)="onChangeStore()"
+                                               [ngClass]="{ 'is-invalid': fpsubmitted && fp.store.errors }"
+
+                                    ></ng-select>
+                                    <div *ngIf="fpsubmitted && fp.store.errors" class="invalid-feedback">
+                                        <div *ngIf="fp.store.errors.required">Store is required</div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Upsell Product</label>
+                                    <ng-select bindLabel="upsellProduct.title"
+                                               [multiple]="true"
+                                               [maxSelectedItems]="3"
+                                               formControlName="upsell"
+                                               [items]="upsells | async"></ng-select>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mr-1">Save Changes</button>
+                        <button type="submit" class="btn btn-secondary">Cancel</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">Product Images</h4>
+                    <dropzone class="dropzone"></dropzone>
+                </div>
+
+            </div> <!-- end card-->
+
+            <div class="card">
+                <div class="card-body">
+
+                    <h4 class="card-title">Meta Data</h4>
+                    <p class="card-title-desc">Fill all information below</p>
+
+                    <form [formGroup]="formProductMeta" (ngSubmit)="metaOnSubmit()">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-group">
+                                        <label for="metakeywords">Meta Keywords</label>
+                                        <ng-select id="metakeywords" formControlName="metakeywords"
+                                                   [hideSelected]="true"
+                                                   bindLabel="name"
+                                                   [addTag]="addTagmeta"
+                                                   [items]="tags | async" [multiple]="true"
+                                        ></ng-select>
+
+                                    </div>
+                                    <label for="shortDescription">Meta Short Description</label>
+                                    <input id="shortDescription" formControlName="shortDescription" type="text"
+                                           class="form-control"
+                                           [ngClass]="{ 'is-invalid': fpmsubmitted && fpm.shortDescription.errors }"
+                                    >
+                                    <div *ngIf="fpmsubmitted && fpm.shortDescription.errors" class="invalid-feedback">
+                                        <div *ngIf="fpm.shortDescription.errors.required">Short Description is required</div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="longDescription">Meta Description</label>
+                                    <textarea class="form-control" id="longDescription"
+                                              formControlName="longDescription" rows="5"
+                                              [ngClass]="{ 'is-invalid': fpmsubmitted && fpm.longDescription.errors }"
+                                    ></textarea>
+                                    <div *ngIf="fpmsubmitted && fpm.longDescription.errors" class="invalid-feedback">
+                                        <div *ngIf="fpm.longDescription.errors.required">Description is required</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary mr-1">Save Changes</button>
+                        <button type="submit" class="btn btn-secondary">Cancel</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end row -->
+
+</div> <!-- container-fluid -->

@@ -1,0 +1,310 @@
+<!-- ========== Left Sidebar Start ========== -->
+
+<ng-template #contentTemplate>
+  <!--- Sidemenu -->
+  <div id="sidebar-menu">
+    <!-- Left Menu Start -->
+    <ul class="metismenu list-unstyled" id="side-menu" #sideMenu>
+      <li class="menu-title">Menu</li>
+
+      <li>
+        <a href="javascript: void(0);" >
+          <i class="bx bx-home-circle"></i><span class="badge badge-pill badge-info float-right">03</span>
+          <span>Dashboards</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow">
+          <i class="bx bx-layout"></i>
+          <span>Layouts</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a (click)="changeLayout('horizontal')" href="javascript: void(0);">Horizontal</a></li>
+          <li><a (click)="lightSidebar()" href="javascript: void(0);">Light Sidebar</a></li>
+          <li><a (click)="compactSidebar()" href="javascript: void(0);">Compact Sidebar</a>
+          </li>
+          <li><a (click)="iconSidebar()" href="javascript: void(0);">Icon Sidebar</a></li>
+          <li><a (click)="boxedLayout()" href="javascript: void(0);">Boxed Layout</a></li>
+          <li><a (click)="coloredSidebar()" href="javascript: void(0);">Colored Sidebar</a>
+          </li>
+        </ul>
+      </li>
+
+      <li class="menu-title">Apps</li>
+
+      <li>
+        <a href="javascript: void(0);">
+          <i class="bx bx-calendar"></i>
+          <span>Calendar</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);">
+          <i class="bx bx-chat"></i>
+          <span class="badge badge-pill badge-success float-right">New</span>
+          <span>Chat</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow">
+          <i class="bx bx-store"></i>
+          <span>Ecommerce</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a routerLink="/ecommerce/add-product">Add product</a></li>
+          <li><a routerLink="/ecommerce/products">Products</a></li>
+          <li><a href="javascript: void(0);">Orders</a></li>
+          <li><a href="javascript: void(0);">Customers</a>
+          </li>
+          <li><a href="javascript: void(0);">Cart</a></li>
+          <li><a href="javascript: void(0);">Checkout</a></li>
+          <li><a href="javascript: void(0);">Shops</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow waves-effect">
+          <i class="bx bx-bitcoin"></i>
+          <span>Crypto</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a href="javascript: void(0);">Wallet</a></li>
+          <li><a href="javascript: void(0);">Buy/Sell</a></li>
+          <li><a href="javascript: void(0);">Lending</a></li>
+          <li><a href="javascript: void(0);">Orders</a></li>
+          <li><a href="javascript: void(0);">Exchange</a></li>
+          <li><a href="javascript: void(0);">KYC
+              Application</a></li>
+          <li><a href="javascript: void(0);">ICO Landing</a>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <a href="javascript: void(0);" class="has-arrow">
+          <i class="bx bx-envelope"></i>
+          <span>Email</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a href="javascript: void(0);">Inbox</a></li>
+          <li><a href="javascript: void(0);">Read Email</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow">
+          <i class="bx bx-receipt"></i>
+          <span>Invoices</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a href="javascript: void(0);">Invoice List</a></li>
+          <li><a href="javascript: void(0);">Invoice Detail</a>
+          </li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow">
+          <i class="bx bx-briefcase-alt-2"></i>
+          <span>Projects</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a href="javascript: void(0);">Projects Grid</a></li>
+          <li><a href="javascript: void(0);">Projects List</a></li>
+          <li><a href="javascript: void(0);">Project
+              Overview</a></li>
+          <li><a href="javascript: void(0);">Create New</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow">
+          <i class="bx bx-task"></i>
+          <span>Tasks</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a href="javascript: void(0);">Task List</a></li>
+          <li><a href="javascript: void(0);">Kanban Board</a></li>
+          <li><a href="javascript: void(0);">Create Task</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow">
+          <i class="bx bxs-user-detail"></i>
+          <span>Contacts</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a href="javascript: void(0);">User Grid</a></li>
+          <li><a href="javascript: void(0);">User List</a></li>
+          <li><a href="javascript: void(0);">Profile</a></li>
+        </ul>
+      </li>
+
+      <li class="menu-title">Pages</li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow">
+          <i class="bx bx-user-circle"></i>
+          <span>Authentication</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a href="javascript: void(0);">Login</a></li>
+          <li><a href="javascript: void(0);">Register</a></li>
+          <li><a href="javascript: void(0);">Recover
+              Password</a>
+          </li>
+          <li><a href="javascript: void(0);">Lock Screen</a>
+          </li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow">
+          <i class="bx bx-file"></i>
+          <span>Utility</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a href="javascript: void(0);">Starter Page</a></li>
+          <li><a href="javascript: void(0);">Maintenance</a></li>
+          <li><a href="javascript: void(0);">Timeline</a></li>
+          <li><a href="javascript: void(0);">FAQs</a></li>
+          <li><a href="javascript: void(0);">Pricing</a></li>
+          <li><a href="javascript: void(0);">Error 404</a></li>
+          <li><a href="javascript: void(0);">Error 500</a></li>
+        </ul>
+      </li>
+
+      <li class="menu-title">Components</li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow">
+          <i class="bx bx-tone"></i>
+          <span>UI Elements</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a href="javascript: void(0);">Alerts</a></li>
+          <li><a href="javascript: void(0);">Buttons</a></li>
+          <li><a href="javascript: void(0);">Cards</a></li>
+          <li><a href="javascript: void(0);">Carousel</a></li>
+          <li><a href="javascript: void(0);">Dropdowns</a></li>
+          <li><a href="javascript: void(0);">Grid</a></li>
+          <li><a href="javascript: void(0);">Images</a></li>
+          <li><a href="javascript: void(0);">Modals</a></li>
+          <li><a href="javascript: void(0);">Range Slider</a></li>
+          <li><a href="javascript: void(0);">Progress Bars</a></li>
+          <li><a href="javascript: void(0);">Sweet-Alert</a></li>
+          <li><a href="javascript: void(0);">Tabs &
+              Accordions</a></li>
+          <li><a href="javascript: void(0);">Typography</a></li>
+          <li><a href="javascript: void(0);">Video</a></li>
+          <li><a href="javascript: void(0);">General</a></li>
+          <li><a href="javascript: void(0);">Colors</a></li>
+          <li><a href="javascript: void(0);">Image Cropper</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-dropdown">
+          <i class="bx bxs-eraser"></i>
+          <span class="badge badge-pill badge-danger float-right">6</span>
+          <span>Forms</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a href="javascript: void(0);">Form Elements</a></li>
+          <li><a href="javascript: void(0);">Form Validation</a>
+          </li>
+          <li><a href="javascript: void(0);">Form Advanced</a></li>
+          <li><a href="javascript: void(0);">Form Editors</a></li>
+          <li><a href="javascript: void(0);">Form File Upload</a>
+          </li>
+          <li><a href="javascript: void(0);">Form Repeater</a></li>
+          <li><a href="javascript: void(0);">Form Wizard</a></li>
+          <li><a href="javascript: void(0);">Form Mask</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow">
+          <i class="bx bx-list-ul"></i>
+          <span>Tables</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a href="javascript: void(0);">Basic Tables</a></li>
+          <li><a href="javascript: void(0);">Advanced Table</a>
+          </li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow">
+          <i class="bx bxs-bar-chart-alt-2"></i>
+          <span>Charts</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a href="javascript: void(0);">Apex charts</a></li>
+          <li><a href="javascript: void(0);">Chartjs Chart</a></li>
+          <li><a href="javascript: void(0);">Chartist Chart</a>
+          </li>
+          <li><a href="javascript: void(0);">E - Chart</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow">
+          <i class="bx bx-aperture"></i>
+          <span>Icons</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a href="javascript: void(0);">Boxicons</a></li>
+          <li><a href="javascript: void(0);">Material
+              Design</a></li>
+          <li><a href="javascript: void(0);">Dripicons</a></li>
+          <li><a href="javascript: void(0);">Font awesome</a>
+          </li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow">
+          <i class="bx bx-map"></i>
+          <span>Maps</span>
+        </a>
+        <ul class="sub-menu" aria-expanded="false">
+          <li><a href="javascript: void(0);">Google Maps</a></li>
+        </ul>
+      </li>
+
+      <li>
+        <a href="javascript: void(0);" class="has-arrow waves-effect">
+          <i class="bx bx-share-alt"></i>
+          <span>Multi Level</span>
+        </a>
+        <ul class="sub-menu mm-collapse" aria-expanded="true">
+          <li><a href="javascript: void(0);">Level 1.1</a></li>
+          <li><a href="javascript: void(0);" class="has-arrow">Level 1.2</a>
+            <ul class="sub-menu mm-collapse" aria-expanded="true">
+              <li><a href="javascript: void(0);">Level 2.1</a></li>
+              <li><a href="javascript: void(0);">Level 2.2</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</ng-template>
+<!-- Sidebar -->
+
+<div class="vertical-menu">
+  <perfect-scrollbar [config]="configData">
+    <div *ngIf="!isCondensed">
+      <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+    </div>
+    <div *ngIf="isCondensed">
+      <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+    </div>
+  </perfect-scrollbar>
+</div>
+<!-- Left Sidebar End -->
