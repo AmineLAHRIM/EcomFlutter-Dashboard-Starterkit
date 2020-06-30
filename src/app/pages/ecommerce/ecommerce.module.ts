@@ -24,7 +24,8 @@ import {OrdersComponent} from './orders/orders.component';
 const config: DropzoneConfigInterface = {
     // Change this to your upload POST address:
     url: 'https://httpbin.org/post',
-    maxFilesize: 100,
+    maxFilesize: 10,
+    acceptedFiles: 'image/jpeg,image/png,image/gif'
 };
 
 @NgModule({

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {EcommerceService} from '../../../core/services/ecommerce.service';
 import {Product, Unit} from '../../../core/models/product';
@@ -12,6 +12,7 @@ import {User} from '../../../core/models/user';
 import {UserService} from '../../../core/services/user.service';
 import {Upsell} from '../../../core/models/upsell';
 import {Tag} from '../../../core/models/tag';
+import {NgxDropzoneComponent} from 'ngx-dropzone';
 
 @Component({
     selector: 'app-addproduct',
@@ -27,6 +28,7 @@ export class AddproductComponent implements OnInit {
     constructor(private ecommerceService: EcommerceService, private userService: UserService) {
     }
 
+    @ViewChild('dropzone', {static: true}) dropzone: NgxDropzoneComponent;
     // bread crumb items
     breadCrumbItems: Array<{}>;
     formProduct: FormGroup;
@@ -90,7 +92,6 @@ export class AddproductComponent implements OnInit {
     get fpm() {
         return this.formProductMeta.controls;
     }
-
 
     priceValidators(control: FormControl) {
         const regex1 = /^[0-9]+([.][0-9]+)?$/;
@@ -235,6 +236,7 @@ export class AddproductComponent implements OnInit {
 
 
         }
+
     }
 
     onChangeSuperCategory() {
@@ -270,4 +272,22 @@ export class AddproductComponent implements OnInit {
         });
     }
 
+
+    // DropZone
+
+    public onUploadInit(args: any): void {
+        console.log('onUploadInit:', args);
+    }
+
+    public onUploadError(args: any): void {
+        console.log('onUploadError:', args);
+    }
+
+    public onUploadSuccess(args: any): void {
+        console.log('onUploadSuccess:', args);
+    }
+
+    onUploadAccept(args: any) {
+        console.log('onUploadAccept:', args);
+    }
 }

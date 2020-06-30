@@ -159,7 +159,9 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title mb-3">Product Images</h4>
-                    <dropzone class="dropzone"></dropzone>
+                    <dropzone #dropzone (sucess)="onUploadSuccess($event)" (init)="onUploadInit($event)"
+                              (accept)="onUploadAccept($event)"
+                              (error)="onUploadError($event)" class="dropzone"></dropzone>
                 </div>
 
             </div> <!-- end card-->
@@ -190,7 +192,9 @@
                                            [ngClass]="{ 'is-invalid': fpmsubmitted && fpm.shortDescription.errors }"
                                     >
                                     <div *ngIf="fpmsubmitted && fpm.shortDescription.errors" class="invalid-feedback">
-                                        <div *ngIf="fpm.shortDescription.errors.required">Short Description is required</div>
+                                        <div *ngIf="fpm.shortDescription.errors.required">Short Description is
+                                            required
+                                        </div>
                                     </div>
                                 </div>
 
