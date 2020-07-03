@@ -12,6 +12,7 @@ import {catchError, take, tap} from 'rxjs/operators';
 import {SuperCategory} from '../models/super-category';
 import {Store} from '../models/store';
 import {Seller} from '../models/seller';
+import {FileObj} from '../models/file-obj';
 
 @Injectable({
     providedIn: 'root'
@@ -197,9 +198,18 @@ export class EcommerceService {
         const url = REST_API_URL + '/seller/' + id;
         return this.httpClient.delete<number>(url);
     }
+
     // -----------------------------Upsell
 
 
+    // -----------------------------File
+
+    uploadFile(file: File) {
+        const url = REST_API_URL + '/file/uploadfile/';
+        const formData = new FormData();
+        formData.append('file', file, file.name);
+        return this.httpClient.post<FileObj>(url, file);
+    }
 
     // -----------------------------handleError
 
@@ -215,4 +225,6 @@ export class EcommerceService {
         }
         return throwError(errorMessages);
     }
+
+
 }

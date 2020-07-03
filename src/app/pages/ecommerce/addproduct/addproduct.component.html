@@ -159,8 +159,8 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title mb-3">Product Images</h4>
-                    <dropzone #dropzone (sucess)="onUploadSuccess($event)" (init)="onUploadInit($event)"
-                              (accept)="onUploadAccept($event)"
+                    <dropzone #dropzone (success)="onUploadSuccess($event)"
+                              (addedFile)="onAddedFile($event)"
                               (error)="onUploadError($event)" class="dropzone"></dropzone>
                 </div>
 

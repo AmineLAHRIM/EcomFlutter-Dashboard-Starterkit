@@ -275,6 +275,14 @@ export class AddproductComponent implements OnInit {
 
     // DropZone
 
+    public onDrop(files: FileList) {
+        console.log('onDrop:', files);
+    }
+
+    public onUploadChange(args: any) {
+        console.log('onUploadInit:', args);
+    }
+
     public onUploadInit(args: any): void {
         console.log('onUploadInit:', args);
     }
@@ -289,5 +297,14 @@ export class AddproductComponent implements OnInit {
 
     onUploadAccept(args: any) {
         console.log('onUploadAccept:', args);
+    }
+
+    onAddedFile(file: File) {
+        console.log('onAddedFile:', file);
+       /* this.ecommerceService.uploadFile(file).subscribe(fileObj => {
+            if (fileObj != null) {
+                console.log('Uploaded ' + fileObj);
+            }
+        });*/
     }
 }

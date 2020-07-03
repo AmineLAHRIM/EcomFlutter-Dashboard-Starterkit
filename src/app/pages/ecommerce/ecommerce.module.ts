@@ -20,10 +20,11 @@ import {CartComponent} from './cart/cart.component';
 import {AddproductComponent} from './addproduct/addproduct.component';
 import {CustomersComponent} from './customers/customers.component';
 import {OrdersComponent} from './orders/orders.component';
+import {REST_API_URL} from '../../../environments/environment';
 
 const config: DropzoneConfigInterface = {
     // Change this to your upload POST address:
-    url: 'https://httpbin.org/post',
+    url: REST_API_URL + '/file/uploadfile/',
     maxFilesize: 10,
     acceptedFiles: 'image/jpeg,image/png,image/gif'
 };
