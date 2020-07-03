@@ -16,8 +16,8 @@ export const environment = {
     }
 };
 
-//export const REST_API_URL = 'http://localhost:8090/ecomflutter';
-export const REST_API_URL = 'https://ecomflutter.herokuapp.com';
+export const REST_API_URL = 'http://localhost:8090/ecomflutter';
+//export const REST_API_URL = 'https://ecomflutter.herokuapp.com';
 
 
 /*
