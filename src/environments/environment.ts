@@ -19,6 +19,7 @@ export const environment = {
 //export const REST_API_URL = 'http://localhost:8090/ecomflutter';
 export const REST_API_URL = 'https://ecomflutter.herokuapp.com';
 
+
 /*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
