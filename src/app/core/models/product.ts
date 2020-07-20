@@ -6,12 +6,15 @@ import {ProductCategoryDetail} from './product-category-detail';
 import {ProductWishListDetail} from './product-wish-list-detail';
 import {Upsell} from './upsell';
 import {Tag} from './tag';
+import {RankStars} from './rank-stars';
 
 export enum Unit {
     KG = 'KG', G = 'G', MG = 'MG', PIECE = 'PIECE'
 }
 
 export class Product {
+
+
     id: number;
     title: string;
     shortDescription: string;
@@ -26,6 +29,7 @@ export class Product {
 
 
     rank: Rank;
+    rankStars: RankStars;
     store: Store;
 
     productCategoryDetails: ProductCategoryDetail[];
@@ -36,4 +40,6 @@ export class Product {
 
 
     categories: Category[];
+
+
 }

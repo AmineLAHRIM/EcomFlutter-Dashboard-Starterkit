@@ -33,7 +33,7 @@
 
                                 <div class="form-group">
                                     <label for="pricePromo">Promo Price</label>
-                                    <input id="pricePromo" formControlName="pricePromo" type="text"
+                                    <input id="pricePromo" formControlName="pricePromo" type="number"
                                            class="form-control"
                                            [ngClass]="{ 'is-invalid': fpsubmitted && fp.pricePromo.errors }"
                                     >
@@ -46,7 +46,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="price">Price</label>
-                                    <input id="price" formControlName="price" type="text" class="form-control"
+                                    <input id="price" formControlName="price" type="number" class="form-control"
                                            [ngClass]="{ 'is-invalid': fpsubmitted && fp.price.errors }"
                                     >
                                     <div *ngIf="fpsubmitted && fp.price.errors" class="invalid-feedback">
@@ -59,7 +59,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="shippingPrice">Shipping Price</label>
-                                    <input id="shippingPrice" formControlName="shippingPrice" type="text"
+                                    <input id="shippingPrice" formControlName="shippingPrice" type="number"
                                            class="form-control"
                                            [ngClass]="{ 'is-invalid': fpsubmitted && fp.shippingPrice.errors }"
                                     >
@@ -87,18 +87,6 @@
 
                             <div class="col-sm-6">
 
-                                <div class="form-group">
-                                    <label class="control-label">Parent Category</label>
-                                    <ng-select bindLabel="name"
-                                               formControlName="superCategory"
-                                               (change)="onChangeSuperCategory()"
-                                               [clearable]="false" [items]="superCategories | async"
-
-                                    ></ng-select>
-                                    <!--<div *ngIf="fpsubmitted && fp.superCategory.errors" class="invalid-feedback">
-                                        <div *ngIf="fp.superCategory.errors.required">Parent Category is required</div>
-                                    </div>-->
-                                </div>
                                 <div class="form-group">
                                     <label class="control-label">Category</label>
                                     <ng-select bindLabel="name"
@@ -142,16 +130,16 @@
                                     <label class="control-label">Upsell Product</label>
                                     <ng-select bindLabel="upsellProduct.title"
                                                [multiple]="true"
-                                               [maxSelectedItems]="3"
+                                               [maxSelectedItems]="5"
                                                formControlName="upsell"
                                                [items]="upsells | async"></ng-select>
                                 </div>
 
                             </div>
                         </div>
-
                         <button type="submit" class="btn btn-primary mr-1">Save Changes</button>
-                        <button type="submit" class="btn btn-secondary">Cancel</button>
+                        <button type="button" (click)="onCancelFormProduct()" class="btn btn-secondary">Cancel</button>
+
                     </form>
                 </div>
             </div>
@@ -159,9 +147,41 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title mb-3">Product Images</h4>
-                    <dropzone #dropzone (success)="onUploadSuccess($event)"
+                    <div>
+                        <div class="row d-flex">
+                            <div *ngFor="let productImage of productImages;let index=i" class="col-2 mb-2">
+                                <div class="row justify-content-center product-img">
+                                    <div class="avatar-sm product-ribbon">
+                                        <div (click)="onDeleteProductImage(productImage)"
+                                             class="badge badge-pill badge-soft-danger font-size-12">×
+                                        </div>
+                                    </div>
+                                    <img class="rounded" src="{{productImage.imageUrl}}" height="140" alt=""/>
+                                </div>
+                                <!--<div class="row justify-content-center mt-2">
+                                    <div class="badge badge-pill badge-soft-danger font-size-12">Delete</div>
+                                </div>-->
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <button type="button" (click)="onSaveProductImages()" class="btn btn-primary mr-1">Save
+                                Changes
+                            </button>
+                            <button type="button" (click)="onCancelFormProductImages()" class="btn btn-secondary">Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- end card-->
+
+            <div class="card">
+                <div class="card-body">
+                    <dropzone [disabled]="dropzoneDisabled" #dropzone (success)="onUploadSuccess($event)"
                               (addedFile)="onAddedFile($event)"
+                              (init)="onUploadInit($event)"
+                              (removedFile)="onRemovedFile($event)"
                               (error)="onUploadError($event)" class="dropzone"></dropzone>
+
                 </div>
 
             </div> <!-- end card-->
@@ -191,7 +211,8 @@
                                            class="form-control"
                                            [ngClass]="{ 'is-invalid': fpmsubmitted && fpm.shortDescription.errors }"
                                     >
-                                    <div *ngIf="fpmsubmitted && fpm.shortDescription.errors" class="invalid-feedback">
+                                    <div *ngIf="fpmsubmitted && fpm.shortDescription.errors"
+                                         class="invalid-feedback">
                                         <div *ngIf="fpm.shortDescription.errors.required">Short Description is
                                             required
                                         </div>
@@ -207,14 +228,17 @@
                                               formControlName="longDescription" rows="5"
                                               [ngClass]="{ 'is-invalid': fpmsubmitted && fpm.longDescription.errors }"
                                     ></textarea>
-                                    <div *ngIf="fpmsubmitted && fpm.longDescription.errors" class="invalid-feedback">
-                                        <div *ngIf="fpm.longDescription.errors.required">Description is required</div>
+                                    <div *ngIf="fpmsubmitted && fpm.longDescription.errors"
+                                         class="invalid-feedback">
+                                        <div *ngIf="fpm.longDescription.errors.required">Description is required
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary mr-1">Save Changes</button>
-                        <button type="submit" class="btn btn-secondary">Cancel</button>
+                        <button type="button" (click)="onCancelFormProductMeta()" class="btn btn-secondary">Cancel
+                        </button>
                     </form>
                 </div>
             </div>

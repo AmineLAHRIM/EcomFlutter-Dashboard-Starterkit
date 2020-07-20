@@ -10,6 +10,7 @@ import {AddproductComponent} from './addproduct/addproduct.component';
 import {CustomersComponent} from './customers/customers.component';
 import {OrdersComponent} from './orders/orders.component';
 import {ProductsResolverService} from './products/products-resolver.service';
+import {CategoriesComponent} from './categories/categories.component';
 
 const routes: Routes = [
     {
@@ -26,6 +27,10 @@ const routes: Routes = [
         component: ProductdetailComponent
     },
     {
+        path: 'categories',
+        component: CategoriesComponent
+    },
+    {
         path: 'shops',
         component: ShopsComponent
     },
@@ -39,6 +44,10 @@ const routes: Routes = [
     },
     {
         path: 'add-product',
+        component: AddproductComponent
+    },
+    {
+        path: 'add-product/:id',
         component: AddproductComponent
     },
     {

@@ -3,21 +3,28 @@ import {Product} from '../../../core/models/product';
 import {ActivatedRouteSnapshot, Resolve, RouterStateSnapshot} from '@angular/router';
 import {EcommerceService} from '../../../core/services/ecommerce.service';
 import {Observable} from 'rxjs';
-import {tap} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
+import {RankStarsService} from '../../../core/services/rank-stars.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ProductsResolverService implements Resolve<Product[]> {
 
-    constructor(private ecommerceService: EcommerceService) {
+    constructor(private ecommerceService: EcommerceService, private rankStarsService: RankStarsService) {
     }
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Product[]> | Promise<Product[]> | Product[] {
         // automatique subscriped to it
-        return this.ecommerceService.findAllProducts().pipe(tap(products => {
-            this.ecommerceService.productsChanged.next(products);
-        }));
+        return this.ecommerceService.findAllProducts().pipe(map(products => {
+                products.map(product => {
+                    this.rankStarsService.setupRank(product);
+                });
+                return products;
+            }),
+            tap(products => {
+                this.ecommerceService.productsChanged.next(products);
+            }));
     }
 
     /*resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): any {

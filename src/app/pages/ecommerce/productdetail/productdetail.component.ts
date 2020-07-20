@@ -1,13 +1,13 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {EcommerceService} from '../../../core/services/ecommerce.service';
 import {Product} from '../../../core/models/product';
 import {Subject, Subscription} from 'rxjs';
 import {ProductImage} from '../../../core/models/product-image';
-import {Rank} from '../../../core/models/rank';
 import {AlertMessage} from '../../../core/models/alert-message';
-import {SuperCategory} from '../../../core/models/super-category';
 import {Category} from '../../../core/models/category';
+import {Upsell} from '../../../core/models/upsell';
+import {EcommerceService} from '../../../core/services/ecommerce.service';
+import {RankStarsService} from '../../../core/services/rank-stars.service';
 
 @Component({
     selector: 'app-productdetail',
@@ -23,15 +23,11 @@ export class ProductdetailComponent implements OnInit, OnDestroy {
 
     breadCrumbItems: Array<{}>;
     private id: number;
-    rank: Rank;
-    numbers = [];
-    leftedNumbers = [];
-    fraction = 0;
     errors = [];
     product: Product;
     productImages: ProductImage[] = [];
+    relativeUpsells: Upsell[] = [];
 
-    superCategory: SuperCategory;
     categories = new Subject<Category[]>();
 
     selectedCategories = [];
@@ -39,7 +35,8 @@ export class ProductdetailComponent implements OnInit, OnDestroy {
     private subs: Subscription[] = [];
     private sub: Subscription;
 
-    constructor(private route: ActivatedRoute, private router: Router, private ecommerceService: EcommerceService) {
+
+    constructor(private route: ActivatedRoute, private router: Router, private ecommerceService: EcommerceService, private rankStarsService: RankStarsService) {
     }
 
     ngOnInit() {
@@ -47,43 +44,14 @@ export class ProductdetailComponent implements OnInit, OnDestroy {
         this.sub = this.route.params.subscribe((params: Params) => {
             this.id = +params.id;
             console.log('hada id=', this.id);
-
             // after confirm
+            this.setupSub();
 
         });
         this.subs.push(this.sub);
-        this.setupSub();
+
 
         this.breadCrumbItems = [{label: 'Ecommerce'}, {label: 'Product Detail', active: true}];
-    }
-
-    setupRank() {
-        if (this.rank != null) {
-
-            const rankSum = this.rank.numberStar1 +
-                this.rank.numberStar2 +
-                this.rank.numberStar3 +
-                this.rank.numberStar4 +
-                this.rank.numberStar5;
-
-            let rankAvg = 0;
-            if (rankSum !== 0) {
-                rankAvg = (this.rank.numberStar1 * 1 +
-                    this.rank.numberStar2 * 2 +
-                    this.rank.numberStar3 * 3 +
-                    this.rank.numberStar4 * 4 +
-                    this.rank.numberStar5 * 5) / rankSum;
-                const fixednumber = parseInt(rankAvg + '', 0);
-                this.numbers = Array(fixednumber).fill(1);
-                this.leftedNumbers = Array(5 - fixednumber - 1).fill(1);
-                console.log('numbers', this.numbers);
-                this.fraction = rankAvg - fixednumber;
-                console.log('fraction', this.fraction);
-
-            }
-        }
-
-
     }
 
 
@@ -91,15 +59,25 @@ export class ProductdetailComponent implements OnInit, OnDestroy {
         this.sub = this.ecommerceService.findProduct(this.id).subscribe(res => {
             if (res.output != null) {
                 console.log('before hahoma category', this.selectedCategories);
-                this.product = res.output;
-                this.superCategory = this.product.categories[0]?.superCategory;
+                this.product = new Product();
+                console.log('fullName', this.product);
+
+                this.product = res.output as Product;
+                this.relativeUpsells = this.product.upsells.slice(0, 3);
+                this.relativeUpsells.forEach(upsell => {
+                    this.rankStarsService.setupRank(upsell.upsellProduct);
+                });
                 this.categories.next(this.product.categories);
                 this.selectedCategories = this.product.categories;
-                console.log('hahoma category', this.selectedCategories);
+                if (this.product.productImages != null) {
+                    this.productImages = this.product.productImages;
+                    console.log('hada product images=', this.productImages);
+
+                }
 
                 // setup rank
-                this.rank = this.product.rank;
-                this.setupRank();
+                this.rankStarsService.setupRank(this.product);
+
                 console.log('hada product=', this.product);
             }
         }, error1 => {
@@ -110,13 +88,6 @@ export class ProductdetailComponent implements OnInit, OnDestroy {
 
         this.subs.push(this.sub);
 
-        this.sub = this.ecommerceService.findAllProductImagesByProductId(this.id).subscribe(productImages => {
-            if (productImages != null) {
-                this.productImages = productImages;
-                console.log('hada product images=', this.product);
-            }
-        });
-        this.subs.push(this.sub);
 
     }
 
@@ -132,6 +103,7 @@ export class ProductdetailComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.subs.forEach(sub => {
+            console.log('unsubscribe');
             sub.unsubscribe();
         });
     }

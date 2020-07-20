@@ -1,6 +1,7 @@
 <div class="container-fluid">
     <!-- page title -->
-    <ngb-alert  *ngIf="typemessage!=null" (close)="typemessage=null" type="{{typemessage}}" [dismissible]="true">{{message}}
+    <ngb-alert *ngIf="typemessage!=null" (close)="typemessage=null" type="{{typemessage}}" [dismissible]="true">
+        {{message}}
     </ngb-alert>
 
     <app-page-title title="Product" [breadcrumbItems]="breadCrumbItems"></app-page-title>
@@ -9,6 +10,10 @@
         <div class="col-lg-3">
             <div class="card">
                 <div class="card-body">
+                    <button (click)="onResetFilter()" type="button" class="close float-right" data-dismiss="modal"
+                            aria-label="Close">
+                        <span class="font-size-12" aria-hidden="true">Reset All &times;</span>
+                    </button>
                     <h4 class="card-title mb-4">Filter</h4>
                     <div>
                         <h5 class="font-size-14 mb-3">Clothes</h5>
@@ -23,17 +28,26 @@
                         </ul>
                     </div>
                     <div class="mt-4 pt-3">
+                        <button (click)="onResetPrice()" type="button" class="close float-right" data-dismiss="modal"
+                                aria-label="Close">
+                            <span class="font-size-12" aria-hidden="true">Reset &times;</span>
+                        </button>
                         <h5 class="font-size-14 mb-3">Price</h5>
-                        <ng5-slider [(value)]="pricevalue" [(highValue)]="maxVal" [options]="priceoption"></ng5-slider>
+                        <ng5-slider (userChangeEnd)="onUserPriceChangeEnd()" [(value)]="productFilters.minPrice"  [(highValue)]="productFilters.maxPrice" [(options)]="priceoption"></ng5-slider>
                     </div>
 
                     <div class="mt-4 pt-3">
+                        <button (click)="onResetDiscount()" type="button" class="close float-right" data-dismiss="modal"
+                                aria-label="Close">
+                            <span class="font-size-12" aria-hidden="true">Reset &times;</span>
+                        </button>
                         <h5 class="font-size-14 mb-3">Discount</h5>
-                        <div class="custom-control custom-checkbox mt-2">
-                            <input type="checkbox" class="custom-control-input" id="productdiscountCheck1">
-                            <label class="custom-control-label" for="productdiscountCheck1">Less than 10%</label>
+
+                        <div *ngFor="let radio of radioListDiscount;let i=index"  class="custom-control custom-radio mt-2">
+                            <input type="radio" name="discount" (change)="onDiscount(radio,$event)" [checked]="radio.isChecked"  class="custom-control-input" [id]="'productdiscountCheck'+i">
+                            <label class="custom-control-label" [for]="'productdiscountCheck'+i">{{radio.label}}</label>
                         </div>
-                        <div class="custom-control custom-checkbox mt-2">
+                        <!--<div class="custom-control custom-checkbox mt-2">
                             <input type="checkbox" class="custom-control-input" id="productdiscountCheck2">
                             <label class="custom-control-label" for="productdiscountCheck2">10% or more</label>
                         </div>
@@ -52,34 +66,23 @@
                         <div class="custom-control custom-checkbox mt-2">
                             <input type="checkbox" class="custom-control-input" id="productdiscountCheck6">
                             <label class="custom-control-label" for="productdiscountCheck6">50% or more</label>
-                        </div>
+                        </div>-->
                     </div>
 
                     <div class="mt-4 pt-3">
+                        <button (click)="onResetRating()" type="button" class="close float-right" data-dismiss="modal"
+                                aria-label="Close">
+                            <span class="font-size-12" aria-hidden="true">Reset &times;</span>
+                        </button>
                         <h5 class="font-size-14 mb-3">Customer Rating</h5>
                         <div>
-                            <div class="custom-control custom-checkbox mt-2">
-                                <input type="checkbox" class="custom-control-input" id="productratingCheck1">
-                                <label class="custom-control-label" for="productratingCheck1">4 <i
+                            <div *ngFor="let radio of radioListRating;let i=index"
+                                 class="custom-control custom-radio mt-2">
+                                <input (change)="customRating(radio,$event)" [checked]="radio.isChecked" name="customrating" type="radio"
+                                       class="custom-control-input" [id]="'productratingCheck'+i">
+                                <label class="custom-control-label" [for]="'productratingCheck'+i">{{radio.rating}} <i
                                         class="bx bx-star text-warning"></i>
                                     & Above</label>
-                            </div>
-                            <div class="custom-control custom-checkbox mt-2">
-                                <input type="checkbox" class="custom-control-input" id="productratingCheck2">
-                                <label class="custom-control-label" for="productratingCheck2">3 <i
-                                        class="bx bx-star text-warning"></i>
-                                    & Above</label>
-                            </div>
-                            <div class="custom-control custom-checkbox mt-2">
-                                <input type="checkbox" class="custom-control-input" id="productratingCheck3">
-                                <label class="custom-control-label" for="productratingCheck3">2 <i
-                                        class="bx bx-star text-warning"></i>
-                                    & Above</label>
-                            </div>
-                            <div class="custom-control custom-checkbox mt-2">
-                                <input type="checkbox" class="custom-control-input" id="productratingCheck4">
-                                <label class="custom-control-label" for="productratingCheck4">1 <i
-                                        class="bx bx-star text-warning"></i></label>
                             </div>
 
                         </div>
@@ -99,8 +102,8 @@
                     <form class="mt-4 mt-sm-0 float-sm-right form-inline">
                         <div class="search-box mr-2">
                             <div class="position-relative">
-                                <input type="text" class="form-control border-0" placeholder="Search...">
-                                <i class="bx bx-search-alt search-icon"></i>
+                                <input #searchedText type="text"  (input)="onSearch($event.target.value)" class="form-control border-0" placeholder="Search...">
+                                <i (click)="onSearch(searchedText.value)" style="cursor: pointer" class="bx bx-search-alt search-icon"></i>
                             </div>
                         </div>
                         <ul class="nav nav-pills product-view-nav">
@@ -116,16 +119,16 @@
                 </div>
             </div>
             <div class="row">
-                <div *ngFor="let product of products;let i=index" class="col-xl-4 col-sm-6">
+                <div *ngFor="let product of filtredProducts;let i=index" class="col-xl-4 col-sm-6">
                     <div [routerLink]="['/ecommerce/product',product.id]" class="card">
                         <div class="card-body">
                             <div class="product-img position-relative">
                                 <div class="avatar-sm product-ribbon">
-                  <span class="avatar-title rounded-circle  bg-primary">
-                    <div *ngIf="product.pricePromo>0">
-                        -{{(100-(product.pricePromo*100/product.price))| number:'1.0-0'}}%
-                    </div>
-                  </span>
+                                      <span *ngIf="product.pricePromo>0" class="avatar-title rounded-circle  bg-primary">
+                                        <div>
+                                            -{{(100-(product.pricePromo*100/product.price))| number:'1.0-0'}}%
+                                        </div>
+                                      </span>
                                 </div>
                                 <img src="{{product.featuredImageUrl}}" alt="" class="img-fluid mx-auto d-block">
                             </div>
@@ -134,15 +137,26 @@
                                 </h5>
 
                                 <p class="text-muted">
-                                    <i class="bx bx-star text-warning"></i>
-                                    <i class="bx bx-star text-warning"></i>
-                                    <i class="bx bx-star text-warning"></i>
-                                    <i class="bx bx-star text-warning"></i>
-                                    <i class="bx bx-star text-warning"></i>
+                                    <span *ngFor="let number of  product?.rankStars?.numbers"
+                                          class="bx bxs-star text-warning"></span>
+                                    <span *ngIf="product?.rankStars?.fraction>0.6"
+                                          class="bx bx-star text-warning"></span>
+                                    <span *ngIf="product?.rankStars?.fraction>0.4 && product?.rankStars?.fraction<=0.6"
+                                          class="bx bxs-star-half text-warning"></span>
+                                    <span *ngIf="product?.rankStars?.fraction>0 && product?.rankStars?.fraction<=0.4"
+                                          class="bx bx-star"></span>
+                                    <span *ngFor="let leftedNumber of product?.rankStars?.leftedNumbers"
+                                          class="bx bx-star"></span>
                                 </p>
-                                <h5 class="my-0"><span class="text-muted mr-2"><del>{{ product.price | number:'0.0-2' }}</del></span>
+                                <h5 *ngIf="product.price>product.pricePromo && product.pricePromo>0; else nopromo"
+                                    class="my-0"><span class="text-muted mr-2"><del>{{ product.price | number:'0.0-2' }}</del></span>
                                     <b>{{product.pricePromo | number:'0.0-2'}}</b>
                                 </h5>
+                                <ng-template #nopromo>
+                                    <h5 class="my-0"><span
+                                            class="text-muted mr-2">{{ product.price | number:'0.0-2' }}</span>
+                                    </h5>
+                                </ng-template>
 
                             </div>
                         </div>

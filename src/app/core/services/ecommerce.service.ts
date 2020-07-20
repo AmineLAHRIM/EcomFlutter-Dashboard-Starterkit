@@ -9,7 +9,6 @@ import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Message} from '../models/message';
 import {ProductCategoryDetail} from '../models/product-category-detail';
 import {catchError, take, tap} from 'rxjs/operators';
-import {SuperCategory} from '../models/super-category';
 import {Store} from '../models/store';
 import {Seller} from '../models/seller';
 import {FileObj} from '../models/file-obj';
@@ -69,12 +68,26 @@ export class EcommerceService {
         return this.httpClient.delete<number>(url);
     }
 
+    findMaxMinPrice() {
+        const url = REST_API_URL + '/product/maxminprice';
+        return this.httpClient.get<{ maxPrice: number, minPrice: number }>(url);
+    }
 
     // -----------------------------Product Images
 
     findAllProductImagesByProductId(id: number) {
         const url = REST_API_URL + '/productimage/productId/' + id;
         return this.httpClient.get<ProductImage[]>(url);
+    }
+
+    addProductImage(prodcutImage: ProductImage) {
+        const url = REST_API_URL + '/productimage/';
+        return this.httpClient.post<ProductImage>(url, prodcutImage);
+    }
+
+    deleteProductImageById(id: number) {
+        const url = REST_API_URL + '/productimage/' + id;
+        return this.httpClient.delete<number>(url);
     }
 
     // -----------------------------Product Category Detail
@@ -102,13 +115,18 @@ export class EcommerceService {
         return this.httpClient.post<number>(url, category);
     }
 
-    findAllCategoriesBySuperCategoryId(id: number) {
-        const url = REST_API_URL + '/category/bysupercategoryid/' + id;
+    findAllCategoriesByParentCategoryId(id: number) {
+        const url = REST_API_URL + '/category/byparentcategoryid/' + id;
         return this.httpClient.get<Category[]>(url);
     }
 
     findAllCategories() {
         const url = REST_API_URL + '/category/';
+        return this.httpClient.get<Category[]>(url);
+    }
+
+    findAllParentCategories() {
+        const url = REST_API_URL + '/parent/';
         return this.httpClient.get<Category[]>(url);
     }
 
@@ -119,31 +137,10 @@ export class EcommerceService {
 
     deleteCategoryById(id: number) {
         const url = REST_API_URL + '/category/' + id;
+        console.log('deleteCategoryById', url);
         return this.httpClient.delete<number>(url);
     }
 
-    // -----------------------------Super Category
-
-
-    addSuperCategory(superCategory: SuperCategory) {
-        const url = REST_API_URL + '/supercategory/';
-        return this.httpClient.post<number>(url, superCategory);
-    }
-
-    findAllSuperCategories() {
-        const url = REST_API_URL + '/supercategory/';
-        return this.httpClient.get<SuperCategory[]>(url);
-    }
-
-    findSuperCategoryById(id: number) {
-        const url = REST_API_URL + '/supercategory/' + id;
-        return this.httpClient.get<SuperCategory>(url);
-    }
-
-    deleteSuperCategoryById(id: number) {
-        const url = REST_API_URL + '/supercategory/' + id;
-        return this.httpClient.delete<number>(url);
-    }
 
     // -----------------------------Store
 
@@ -199,6 +196,7 @@ export class EcommerceService {
         return this.httpClient.delete<number>(url);
     }
 
+
     // -----------------------------Upsell
 
 
@@ -209,6 +207,12 @@ export class EcommerceService {
         const formData = new FormData();
         formData.append('file', file, file.name);
         return this.httpClient.post<FileObj>(url, file);
+    }
+
+    downloadFile(url: string) {
+        return this.httpClient.get<ArrayBuffer>(url).pipe(tap(x => {
+            console.log('x', x);
+        }));
     }
 
     // -----------------------------handleError

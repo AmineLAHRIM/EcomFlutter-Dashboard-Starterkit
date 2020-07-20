@@ -20,18 +20,33 @@ import {CartComponent} from './cart/cart.component';
 import {AddproductComponent} from './addproduct/addproduct.component';
 import {CustomersComponent} from './customers/customers.component';
 import {OrdersComponent} from './orders/orders.component';
-import {REST_API_URL} from '../../../environments/environment';
+import {UPLOAD_API_URL} from '../../../environments/environment';
+import {CategoriesComponent} from './categories/categories.component';
+import {NgxDropzoneModule} from 'ngx-dropzone';
 
 const config: DropzoneConfigInterface = {
     // Change this to your upload POST address:
-    url: REST_API_URL + '/file/uploadfile/',
-    maxFilesize: 10,
-    acceptedFiles: 'image/jpeg,image/png,image/gif'
+    url: UPLOAD_API_URL,
+    maxFilesize: 8,
+    acceptedFiles: 'image/jpeg,image/png,image/gif',
+    timeout: 180000,
+    addRemoveLinks: true,
+    dictRemoveFile: ''
 };
 
 @NgModule({
     // tslint:disable-next-line: max-line-length
-    declarations: [ProductsComponent, ProductdetailComponent, ShopsComponent, CheckoutComponent, CartComponent, AddproductComponent, CustomersComponent, OrdersComponent],
+    declarations: [
+        ProductsComponent,
+        ProductdetailComponent,
+        ShopsComponent,
+        CheckoutComponent,
+        CartComponent,
+        AddproductComponent,
+        CustomersComponent,
+        OrdersComponent,
+        CategoriesComponent
+    ],
     imports: [
         CommonModule,
         EcommerceRoutingModule,
@@ -46,7 +61,8 @@ const config: DropzoneConfigInterface = {
         NgSelectModule,
         NgbPaginationModule,
         NgbAlertModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        NgxDropzoneModule
     ],
     providers: [
         {

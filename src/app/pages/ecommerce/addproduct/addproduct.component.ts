@@ -5,14 +5,18 @@ import {Product, Unit} from '../../../core/models/product';
 import {Message} from '../../../core/models/message';
 import {Category} from '../../../core/models/category';
 import {Subject} from 'rxjs';
-import {SuperCategory} from '../../../core/models/super-category';
 import {ProductCategoryDetail} from '../../../core/models/product-category-detail';
 import {Store} from '../../../core/models/store';
 import {User} from '../../../core/models/user';
 import {UserService} from '../../../core/services/user.service';
 import {Upsell} from '../../../core/models/upsell';
 import {Tag} from '../../../core/models/tag';
-import {NgxDropzoneComponent} from 'ngx-dropzone';
+import {ProductImage} from '../../../core/models/product-image';
+import {ActivatedRoute, Params} from '@angular/router';
+import {Response} from '../../../core/models/response';
+import {FileObj} from '../../../core/models/file-obj';
+import {DomSanitizer} from '@angular/platform-browser';
+import {UPLOAD_API_URL} from '../../../../environments/environment';
 
 @Component({
     selector: 'app-addproduct',
@@ -25,10 +29,12 @@ import {NgxDropzoneComponent} from 'ngx-dropzone';
  */
 export class AddproductComponent implements OnInit {
 
-    constructor(private ecommerceService: EcommerceService, private userService: UserService) {
+    constructor(private ecommerceService: EcommerceService, private userService: UserService, private route: ActivatedRoute, private sanitizer: DomSanitizer) {
     }
 
-    @ViewChild('dropzone', {static: true}) dropzone: NgxDropzoneComponent;
+
+    @ViewChild('dropzone', {static: false}) dropzone;
+    //@ViewChild(NgxDropzoneComponent, {static: false}) dropzone: NgxDropzoneComponent;
     // bread crumb items
     breadCrumbItems: Array<{}>;
     formProduct: FormGroup;
@@ -36,29 +42,43 @@ export class AddproductComponent implements OnInit {
     product: Product;
     fpsubmitted = false;
     fpmsubmitted = false;
+    handleFirstImage = false;
     isEditMode = false;
     id: number;
     units: Unit[] = [Unit.KG, Unit.G, Unit.MG, Unit.PIECE];
     errors: Message[] = [];
-
-    superCategories = new Subject<SuperCategory[]>();
-    selectedSuperCategory: SuperCategory;
-
-    upsells = new Subject<Upsell[]>();
-
-    stores = new Subject<Store[]>();
-    selectedStore: Store;
+    files: File[] = [];
 
     categories = new Subject<Category[]>();
-    selectedCategories: Category[] = [];
+    selectedCategories: Category[];
+    productImages: ProductImage[] = [];
+    upsells = new Subject<Upsell[]>();
+    dropzoneDisabled = false;
+    stores = new Subject<Store[]>();
+    selectedStore: Store;
+    imageurl = 'https://am1ne.com/public/uploads/2020-07-18T14:33:21.611Z-104382315.jpg';
 
     tags = new Subject<Tag[]>();
 
     user: User;
 
     ngOnInit() {
+        this.route.params.subscribe((params: Params) => {
+            this.id = +params.id;
+            this.route.queryParams.subscribe(queryParams => {
+                this.isEditMode = queryParams.isEditMode;
+                this.init();
+            });
+        });
+
 
         this.breadCrumbItems = [{label: 'Ecommerce'}, {label: 'Add Product', active: true}];
+
+
+    }
+
+    init() {
+
 
         this.formProduct = new FormGroup({
             title: new FormControl(null, [Validators.required]),
@@ -67,12 +87,10 @@ export class AddproductComponent implements OnInit {
             shippingPrice: new FormControl(null, [this.priceValidators.bind(this)]),
             price: new FormControl(null, [Validators.required, this.priceValidators.bind(this)]),
             unit: new FormControl(null, [Validators.required]),
-            superCategory: new FormControl(null),
             category: new FormControl(null),
             upsell: new FormControl(null),
             store: new FormControl(null, [Validators.required])
         });
-
         this.formProductMeta = new FormGroup({
             metakeywords: new FormControl(null),
             shortDescription: new FormControl(null, [Validators.required]),
@@ -80,8 +98,6 @@ export class AddproductComponent implements OnInit {
         });
 
         this.setupSubs();
-
-
     }
 
 
@@ -126,6 +142,7 @@ export class AddproductComponent implements OnInit {
             console.log('cat value', this.fp.category.value);
             this.product.productCategoryDetails = [];
             this.selectedCategories = this.fp.category.value;
+
             if (this.selectedCategories != null) {
                 this.selectedCategories.forEach(category => {
                     const productCategoryDetail = new ProductCategoryDetail();
@@ -133,8 +150,6 @@ export class AddproductComponent implements OnInit {
                     this.product.productCategoryDetails.push(productCategoryDetail);
                 });
             }
-
-
             console.log('productCategoryDetails', this.product.productCategoryDetails);
             console.log('product', this.product);
 
@@ -169,6 +184,7 @@ export class AddproductComponent implements OnInit {
     }
 
     productOnCancel() {
+
     }
 
     metaOnSubmit() {
@@ -204,9 +220,56 @@ export class AddproductComponent implements OnInit {
         }
     }
 
+    handleUploadImage(imageUrl: string, file: File) {
+        this.errors = [];
+        console.log('handleUploadImage');
+
+        if (!this.isEditMode) {
+            this.product = new Product();
+            this.ecommerceService.addProduct(this.product).subscribe(res => {
+                if (res.output != null) {
+                    this.product = res.output;
+                    this.id = this.product.id;
+                    this.isEditMode = true;
+
+                    this.addProductImageSub(imageUrl, file);
+                }
+            });
+        } else {
+            this.ecommerceService.updateProduct(this.id, this.product).subscribe(res => {
+                if (res.output != null) {
+                    this.product = res.output;
+                    this.addProductImageSub(imageUrl, file);
+                }
+            });
+        }
+
+    }
+
+    private addProductImageSub(imageUrl: string, file: any) {
+        const productImage = new ProductImage();
+        productImage.product = this.product;
+        productImage.imageUrl = imageUrl;
+        this.productImages.push(productImage);
+        this.ecommerceService.addProductImage(productImage).subscribe(productimage => {
+            if (productimage != null) {
+                if (!this.handleFirstImage) {
+                    this.product.featuredImageUrl = productimage.imageUrl;
+                    console.log('Product featured Image Added ' + imageUrl);
+                }
+                file.id = productimage.id;
+                this.handleFirstImage = true;
+                console.log('Product Image Added ' + imageUrl);
+                console.log('File Image Added ' + file);
+            }
+        });
+    }
+
+
     addTagmeta(value) {
         return {name: value, product: this.product};
     }
+
 
     private setupSubs() {
 
@@ -219,36 +282,56 @@ export class AddproductComponent implements OnInit {
                         console.log('seller id', seller.id);
                         this.stores.next(stores);
                     });
-
-
                 });
             }
         });
 
+        this.ecommerceService.findAllCategories().subscribe(categories => {
+            this.categories.next(categories);
+        });
+
         if (!this.isEditMode) {
             // Add Mode
-            this.ecommerceService.findAllSuperCategories().subscribe(superCategories => {
-                this.superCategories.next(superCategories);
-            });
+
         } else {
-
             // Edit Mode
+            this.ecommerceService.findProduct(this.id).subscribe((res: Response) => {
+                this.product = new Product();
+                this.product = res.output;
+                console.log('findProduct', this.product);
 
+                this.formProduct.setValue({
+                    title: this.product?.title,
+                    quantityStock: this.product?.quantityStock,
+                    pricePromo: this.product?.pricePromo,
+                    shippingPrice: this.product?.shippingPrice,
+                    price: this.product?.price,
+                    unit: this.product?.unit,
+                    category: this.product?.categories,
+                    upsell: this.product?.upsells,
+                    store: this.product?.store,
+                });
 
+                this.formProductMeta.setValue({
+                    metakeywords: this.product?.tags,
+                    shortDescription: this.product?.shortDescription,
+                    longDescription: this.product?.longDescription
+                });
+
+                this.productImages = this.product.productImages.slice();
+                /*this.ecommerceService.downloadFile(this.imageurl).subscribe(data => {
+                    const file = new File([data], 'sample.jpg');
+                    this.files.push(file);
+                });*/
+                /*let ngEvent: NgxDropzoneChangeEvent;
+                Url.createObjectURL().createObjectURL(this.product.productImages[0].imageUrl);
+                ngEvent.addedFiles.push(new File());
+                this.dropzone.change.emit();*/
+
+            });
         }
 
-    }
 
-    onChangeSuperCategory() {
-        this.selectedSuperCategory = this.fp.superCategory.value;
-
-        this.fp.category.reset(null);
-        this.categories.next(null);
-
-        this.ecommerceService.findAllCategoriesBySuperCategoryId(this.selectedSuperCategory?.id).subscribe(categories => {
-            this.categories.next(categories);
-            console.log('categories', categories);
-        });
     }
 
 
@@ -285,6 +368,7 @@ export class AddproductComponent implements OnInit {
 
     public onUploadInit(args: any): void {
         console.log('onUploadInit:', args);
+
     }
 
     public onUploadError(args: any): void {
@@ -292,6 +376,8 @@ export class AddproductComponent implements OnInit {
     }
 
     public onUploadSuccess(args: any): void {
+        const file: FileObj = args[1];
+        this.handleUploadImage(file.imageUrl, args[0]);
         console.log('onUploadSuccess:', args);
     }
 
@@ -299,12 +385,84 @@ export class AddproductComponent implements OnInit {
         console.log('onUploadAccept:', args);
     }
 
-    onAddedFile(file: File) {
+    onAddedFile(file: FileObj) {
+
         console.log('onAddedFile:', file);
-       /* this.ecommerceService.uploadFile(file).subscribe(fileObj => {
-            if (fileObj != null) {
-                console.log('Uploaded ' + fileObj);
+        /* this.ecommerceService.uploadFile(file).subscribe(fileObj => {
+             if (fileObj != null) {
+                 console.log('Uploaded ' + fileObj);
+             }
+         });*/
+    }
+
+    onRemovedFile(file: any) {
+        this.ecommerceService.deleteProductImageById(file.id).subscribe(value => {
+            console.log('File Removed:', file);
+        });
+        console.log('onRemovedFile:', file);
+    }
+
+    onCancelFormProduct() {
+        if (this.formProduct != null) {
+            if (!this.isEditMode) {
+                // Add Mode
+                this.formProduct.reset();
+            } else {
+                // Edit Mode
+                this.formProduct.reset({
+                    title: this.product?.title,
+                    quantityStock: this.product?.quantityStock,
+                    pricePromo: this.product?.pricePromo,
+                    shippingPrice: this.product?.shippingPrice,
+                    price: this.product?.price,
+                    unit: this.product?.unit,
+                    category: this.product?.categories,
+                    upsell: this.product?.upsells,
+                    store: this.product?.store,
+                });
+
+                /* this.ecommerceService.findProduct(this.id).subscribe((res: Response) => {
+                     this.product = new Product();
+                     this.product = res.output;
+                     console.log('findProduct', this.product);
+
+
+
+
+                 });*/
             }
-        });*/
+        }
+    }
+
+    onCancelFormProductMeta() {
+        if (this.formProduct != null) {
+            if (!this.isEditMode) {
+                // Add Mode
+                this.formProductMeta.reset();
+            } else {
+                this.formProductMeta.reset({
+                    metakeywords: this.product?.tags,
+                    shortDescription: this.product?.shortDescription,
+                    longDescription: this.product?.longDescription
+                });
+            }
+        }
+    }
+
+
+    onDeleteProductImage(productImage: ProductImage) {
+        this.ecommerceService.deleteProductImageById(productImage.id).subscribe(value => {
+            if (value > 0) {
+
+            }
+        });
+    }
+
+    onSaveProductImages() {
+
+    }
+
+    onCancelFormProductImages() {
+
     }
 }
