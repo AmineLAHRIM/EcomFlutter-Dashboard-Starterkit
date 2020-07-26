@@ -115,7 +115,6 @@
                                 <div class="form-group">
                                     <label class="control-label">Store</label>
                                     <ng-select bindLabel="name"
-                                               formControlName="store"
                                                [items]="stores | async"
 
                                                (change)="onChangeStore()"
@@ -137,14 +136,16 @@
 
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary mr-1">Save Changes</button>
+                        <button type="submit" [disabled]="!formProduct.dirty" class="btn btn-primary mr-1">Save
+                            Changes
+                        </button>
                         <button type="button" (click)="onCancelFormProduct()" class="btn btn-secondary">Cancel</button>
 
                     </form>
                 </div>
             </div>
 
-            <div class="card">
+            <!--<div class="card">
                 <div class="card-body">
                     <h4 class="card-title mb-3">Product Images</h4>
                     <div>
@@ -158,9 +159,9 @@
                                     </div>
                                     <img class="rounded" src="{{productImage.imageUrl}}" height="140" alt=""/>
                                 </div>
-                                <!--<div class="row justify-content-center mt-2">
+                                &lt;!&ndash;<div class="row justify-content-center mt-2">
                                     <div class="badge badge-pill badge-soft-danger font-size-12">Delete</div>
-                                </div>-->
+                                </div>&ndash;&gt;
                             </div>
                         </div>
                         <div class="mt-2">
@@ -172,19 +173,72 @@
                         </div>
                     </div>
                 </div>
-            </div> <!-- end card-->
+            </div> &lt;!&ndash; end card&ndash;&gt;-->
 
             <div class="card">
                 <div class="card-body">
-                    <dropzone [disabled]="dropzoneDisabled" #dropzone (success)="onUploadSuccess($event)"
-                              (addedFile)="onAddedFile($event)"
-                              (init)="onUploadInit($event)"
-                              (removedFile)="onRemovedFile($event)"
-                              (error)="onUploadError($event)" class="dropzone"></dropzone>
+                    <h4 class="card-title mb-3">Product Images</h4>
 
+                    <div>
+                        <div class="row mb-4 d-flex">
+                            <div class="col-12">
+                                <dropzone [disabled]="dropzoneDisabled" #dropzone (success)="onUploadSuccess($event)"
+                                          (addedFile)="onAddedFile($event)"
+                                          (init)="onUploadInit($event)"
+                                          (removedFile)="onRemovedFile($event)"
+                                          (error)="onUploadError($event)" class="dropzone"></dropzone>
+                            </div>
+                        </div>
+                        <div *ngIf="errorsProductImages.length>0">
+                            <div *ngFor="let error of errorsProductImages;let i=index">
+                                <ngb-alert (close)="errors=[]" type="{{error.typeAlert}}" [dismissible]="true">{{
+                                    error.message }}
+                                </ngb-alert>
+                            </div>
+                        </div>
+                        <div class="row d-flex">
+                            <div (click)="onClickProductImage(productImage)" *ngFor="let productImage of productImages;let i=index" class="col-2 mb-2">
+                                <div (mouseleave)="hoverdIndex=-1" (mouseenter)="onProductHover(i)"
+                                     class="row justify-content-center product-img">
+                                    <div class="avatar-sm product-ribbon">
+                                        <div (click)="onDeleteProductImage(productImage)"
+                                             class="btn badge badge-pill badge-soft-danger font-size-12">×
+                                        </div>
+                                    </div>
+
+                                    <img class="rounded" src="{{productImage.imageUrl}}" height="140" alt=""/>
+                                </div>
+                                <!--<div class="row justify-content-center mt-2">
+                                    <div class="badge badge-pill badge-soft-danger font-size-12">Delete</div>
+                                </div>-->
+                                <div class="row justify-content-center mt-2">
+                                    <div *ngIf="productImage.id===featuredImage.id; else notfeautre"
+                                         class="btn badge badge-pill badge-soft-success font-size-12">
+                                        Featured Image
+                                    </div>
+                                    <ng-template #notfeautre >
+                                        <div *ngIf="hoverdIndex===i" class="btn badge badge-pill badge-soft-success font-size-12">
+                                            Featured Image
+                                        </div>
+
+                                    </ng-template>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <button type="button" [disabled]="isSaveProductImages" (click)="onSaveProductImages()"
+                                    class="btn btn-primary mr-1">Save
+                                Changes
+                            </button>
+                            <button type="button" (click)="onCancelFormProductImages()" class="btn btn-secondary">
+                                Cancel
+                            </button>
+                        </div>
+
+                    </div>
                 </div>
-
             </div> <!-- end card-->
+
 
             <div class="card">
                 <div class="card-body">
@@ -236,7 +290,9 @@
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary mr-1">Save Changes</button>
+                        <button type="submit" [disabled]="!formProductMeta.dirty" class="btn btn-primary mr-1">Save
+                            Changes
+                        </button>
                         <button type="button" (click)="onCancelFormProductMeta()" class="btn btn-secondary">Cancel
                         </button>
                     </form>

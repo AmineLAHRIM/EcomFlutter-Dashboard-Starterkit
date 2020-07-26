@@ -24,7 +24,7 @@ export class Product {
     shippingPrice: number;
     quantityStock: number;
     unit: Unit;
-    featuredImageUrl: string;
+    featuredImage: ProductImage;
     deleted: boolean;
 
 

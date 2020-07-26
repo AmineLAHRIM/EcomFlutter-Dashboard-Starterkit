@@ -1,7 +1,7 @@
 <div class="container-fluid">
     <!-- page title -->
-    <ngb-alert *ngIf="typemessage!=null" (close)="typemessage=null" type="{{typemessage}}" [dismissible]="true">
-        {{message}}
+    <ngb-alert *ngIf="alertMessage!=null" (close)="alertMessage=null" type="{{alertMessage.typeAlert}}" [dismissible]="true">
+        {{alertMessage.message}}
     </ngb-alert>
 
     <app-page-title title="Product" [breadcrumbItems]="breadCrumbItems"></app-page-title>
@@ -120,7 +120,7 @@
             </div>
             <div class="row">
                 <div *ngFor="let product of filtredProducts;let i=index" class="col-xl-4 col-sm-6">
-                    <div [routerLink]="['/ecommerce/product',product.id]" class="card">
+                    <div [routerLink]="['/ecommerce/product',product.id]" class="card btn">
                         <div class="card-body">
                             <div class="product-img position-relative">
                                 <div class="avatar-sm product-ribbon">
@@ -130,7 +130,7 @@
                                         </div>
                                       </span>
                                 </div>
-                                <img src="{{product.featuredImageUrl}}" alt="" class="img-fluid mx-auto d-block">
+                                <img src="{{product?.featuredImage?.imageUrl}}" alt="" class="img-fluid mx-auto d-block">
                             </div>
                             <div class="mt-4 text-center">
                                 <h5 class="mb-3 text-truncate"><a href="javascript: void(0);" class="text-dark">{{product.title}}</a>

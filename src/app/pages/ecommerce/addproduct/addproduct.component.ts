@@ -16,7 +16,9 @@ import {ActivatedRoute, Params} from '@angular/router';
 import {Response} from '../../../core/models/response';
 import {FileObj} from '../../../core/models/file-obj';
 import {DomSanitizer} from '@angular/platform-browser';
-import {UPLOAD_API_URL} from '../../../../environments/environment';
+import {NgxDropzoneChangeEvent} from 'ngx-dropzone';
+import {MAX_IMAGE_UPLOAD} from '../../../../environments/environment.prod';
+import {AlertMessage, TypeAlert} from '../../../core/models/alert-message';
 
 @Component({
     selector: 'app-addproduct',
@@ -28,6 +30,9 @@ import {UPLOAD_API_URL} from '../../../../environments/environment';
  * Ecommerce add-product component
  */
 export class AddproductComponent implements OnInit {
+    hoverdIndex = -1;
+    featuredImage: ProductImage;
+    private isNoFeaturedImage = false;
 
     constructor(private ecommerceService: EcommerceService, private userService: UserService, private route: ActivatedRoute, private sanitizer: DomSanitizer) {
     }
@@ -47,11 +52,13 @@ export class AddproductComponent implements OnInit {
     id: number;
     units: Unit[] = [Unit.KG, Unit.G, Unit.MG, Unit.PIECE];
     errors: Message[] = [];
+    errorsProductImages: AlertMessage[] = [];
     files: File[] = [];
-
+    isSaveProductImages = true;
     categories = new Subject<Category[]>();
     selectedCategories: Category[];
     productImages: ProductImage[] = [];
+    productImagesOriginal: ProductImage[] = [];
     upsells = new Subject<Upsell[]>();
     dropzoneDisabled = false;
     stores = new Subject<Store[]>();
@@ -61,6 +68,7 @@ export class AddproductComponent implements OnInit {
     tags = new Subject<Tag[]>();
 
     user: User;
+
 
     ngOnInit() {
         this.route.params.subscribe((params: Params) => {
@@ -125,9 +133,9 @@ export class AddproductComponent implements OnInit {
 
     productOnSubmit() {
         this.fpsubmitted = true;
+        this.formProduct.reset(this.formProduct.value);
         this.errors = [];
         if (this.formProduct.valid) {
-
             if (!this.isEditMode) {
                 this.product = new Product();
             }
@@ -189,6 +197,8 @@ export class AddproductComponent implements OnInit {
 
     metaOnSubmit() {
         this.fpmsubmitted = true;
+        this.formProductMeta.reset(this.formProductMeta.value);
+
         this.errors = [];
         console.log('metaOnSubmit');
 
@@ -220,49 +230,14 @@ export class AddproductComponent implements OnInit {
         }
     }
 
-    handleUploadImage(imageUrl: string, file: File) {
+    handleUploadImage(imageUrl: string) {
         this.errors = [];
         console.log('handleUploadImage');
 
-        if (!this.isEditMode) {
-            this.product = new Product();
-            this.ecommerceService.addProduct(this.product).subscribe(res => {
-                if (res.output != null) {
-                    this.product = res.output;
-                    this.id = this.product.id;
-                    this.isEditMode = true;
-
-                    this.addProductImageSub(imageUrl, file);
-                }
-            });
-        } else {
-            this.ecommerceService.updateProduct(this.id, this.product).subscribe(res => {
-                if (res.output != null) {
-                    this.product = res.output;
-                    this.addProductImageSub(imageUrl, file);
-                }
-            });
-        }
-
-    }
-
-    private addProductImageSub(imageUrl: string, file: any) {
         const productImage = new ProductImage();
-        productImage.product = this.product;
         productImage.imageUrl = imageUrl;
         this.productImages.push(productImage);
-        this.ecommerceService.addProductImage(productImage).subscribe(productimage => {
-            if (productimage != null) {
-                if (!this.handleFirstImage) {
-                    this.product.featuredImageUrl = productimage.imageUrl;
-                    console.log('Product featured Image Added ' + imageUrl);
-                }
-                file.id = productimage.id;
-                this.handleFirstImage = true;
-                console.log('Product Image Added ' + imageUrl);
-                console.log('File Image Added ' + file);
-            }
-        });
+
     }
 
 
@@ -272,6 +247,7 @@ export class AddproductComponent implements OnInit {
 
 
     private setupSubs() {
+
 
         this.userService.userSubject.subscribe(user => {
             if (user != null) {
@@ -292,6 +268,7 @@ export class AddproductComponent implements OnInit {
 
         if (!this.isEditMode) {
             // Add Mode
+
 
         } else {
             // Edit Mode
@@ -319,6 +296,8 @@ export class AddproductComponent implements OnInit {
                 });
 
                 this.productImages = this.product.productImages.slice();
+                this.productImagesOriginal = this.productImages.slice();
+                this.featuredImage = this.product.featuredImage;
                 /*this.ecommerceService.downloadFile(this.imageurl).subscribe(data => {
                     const file = new File([data], 'sample.jpg');
                     this.files.push(file);
@@ -376,8 +355,12 @@ export class AddproductComponent implements OnInit {
     }
 
     public onUploadSuccess(args: any): void {
+        this.isSaveProductImages = false;
         const file: FileObj = args[1];
-        this.handleUploadImage(file.imageUrl, args[0]);
+        this.handleUploadImage(file.imageUrl);
+        setTimeout(() => {
+            args = null;
+        }, 2000);
         console.log('onUploadSuccess:', args);
     }
 
@@ -403,6 +386,8 @@ export class AddproductComponent implements OnInit {
     }
 
     onCancelFormProduct() {
+
+
         if (this.formProduct != null) {
             if (!this.isEditMode) {
                 // Add Mode
@@ -420,16 +405,6 @@ export class AddproductComponent implements OnInit {
                     upsell: this.product?.upsells,
                     store: this.product?.store,
                 });
-
-                /* this.ecommerceService.findProduct(this.id).subscribe((res: Response) => {
-                     this.product = new Product();
-                     this.product = res.output;
-                     console.log('findProduct', this.product);
-
-
-
-
-                 });*/
             }
         }
     }
@@ -451,18 +426,85 @@ export class AddproductComponent implements OnInit {
 
 
     onDeleteProductImage(productImage: ProductImage) {
-        this.ecommerceService.deleteProductImageById(productImage.id).subscribe(value => {
-            if (value > 0) {
-
-            }
-        });
+        this.isSaveProductImages = false;
+        const index = this.productImages.findIndex(pImage => pImage.id === productImage.id);
+        this.productImages.splice(index, 1);
+        if (productImage.id === this.featuredImage.id) {
+            this.isNoFeaturedImage = true;
+        }
     }
 
     onSaveProductImages() {
 
+        if (this.productImages.length > MAX_IMAGE_UPLOAD) {
+            const alertMessage = new AlertMessage();
+            alertMessage.message = 'MAX IMAGES IS ' + MAX_IMAGE_UPLOAD;
+            alertMessage.typeAlert = TypeAlert.DELETE;
+            this.errorsProductImages.push(alertMessage);
+        } else if (this.isNoFeaturedImage) {
+            const alertMessage = new AlertMessage();
+            alertMessage.message = 'PLEASE SELECT FEATURED IMAGE ';
+            alertMessage.typeAlert = TypeAlert.EDIT;
+            this.errorsProductImages.push(alertMessage);
+        } else {
+            this.isSaveProductImages = true;
+            this.errorsProductImages = [];
+
+            if (!this.isEditMode) {
+                this.product = new Product();
+                this.product.productImages = this.productImages;
+                this.product.featuredImage = this.featuredImage;
+                this.ecommerceService.addProduct(this.product).subscribe(res => {
+                    if (res.output != null) {
+                        this.product = res.output;
+                        this.id = this.product.id;
+                        this.isEditMode = true;
+                    }
+                });
+            } else {
+                this.product.productImages = this.productImages;
+                this.product.featuredImage = this.featuredImage;
+                this.ecommerceService.updateProduct(this.id, this.product).subscribe(res => {
+                    if (res.output != null) {
+                        this.product = res.output;
+                    }
+                });
+            }
+            this.productImagesOriginal = this.product.productImages.slice();
+        }
+
     }
 
     onCancelFormProductImages() {
+        this.productImages = this.productImagesOriginal.slice();
+        this.featuredImage = this.product.featuredImage;
+        this.isSaveProductImages = true;
+        this.errorsProductImages = [];
+    }
 
+    onNgxUploadSuccess(event: NgxDropzoneChangeEvent) {
+        console.log('addedFiles', event.addedFiles, event);
+        const file: any = event.addedFiles[0];
+        this.files.push(file);
+        this.ecommerceService.uploadFile(file).subscribe(fileObj => {
+            console.log('uploaded');
+            //this.handleUploadImage(fileObj.imageUrl, file);
+        });
+    }
+
+    onNgxRemovedFile(productImage: ProductImage) {
+        console.log('onNgxRemovedFile');
+        const index = this.productImages.findIndex(pImage => pImage.id === productImage.id);
+        this.productImages.splice(index, 1);
+    }
+
+    onProductHover(index: number) {
+        this.hoverdIndex = index;
+    }
+
+    onClickProductImage(productImage: ProductImage) {
+        this.featuredImage = productImage;
+        this.isSaveProductImages = false;
+        this.isNoFeaturedImage = false;
     }
 }

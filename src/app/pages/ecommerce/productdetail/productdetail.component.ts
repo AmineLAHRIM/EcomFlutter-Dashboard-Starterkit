@@ -3,7 +3,7 @@ import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Product} from '../../../core/models/product';
 import {Subject, Subscription} from 'rxjs';
 import {ProductImage} from '../../../core/models/product-image';
-import {AlertMessage} from '../../../core/models/alert-message';
+import {AlertMessage, TypeAlert} from '../../../core/models/alert-message';
 import {Category} from '../../../core/models/category';
 import {Upsell} from '../../../core/models/upsell';
 import {EcommerceService} from '../../../core/services/ecommerce.service';
@@ -112,7 +112,7 @@ export class ProductdetailComponent implements OnInit, OnDestroy {
         if (this.product != null) {
             this.ecommerceService.deleteProductById(this.product.id).subscribe(value => {
                 if (value >= 0) {
-                    this.router.navigate(['/ecommerce/products'], {queryParams: {typeMessage: AlertMessage.DELETE}});
+                    this.router.navigate(['/ecommerce/products'], {queryParams: {typeAlert: TypeAlert.DELETE}});
                 }
             });
         }

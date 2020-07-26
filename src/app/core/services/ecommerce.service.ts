@@ -12,6 +12,7 @@ import {catchError, take, tap} from 'rxjs/operators';
 import {Store} from '../models/store';
 import {Seller} from '../models/seller';
 import {FileObj} from '../models/file-obj';
+import {UPLOAD_API_URL} from '../../../environments/environment.prod';
 
 @Injectable({
     providedIn: 'root'
@@ -112,7 +113,7 @@ export class EcommerceService {
 
     addCategory(category: Category) {
         const url = REST_API_URL + '/category/';
-        return this.httpClient.post<number>(url, category);
+        return this.httpClient.post<Category>(url, category);
     }
 
     findAllCategoriesByParentCategoryId(id: number) {
@@ -134,6 +135,12 @@ export class EcommerceService {
         const url = REST_API_URL + '/category/' + id;
         return this.httpClient.get<Category>(url);
     }
+
+    updateCategory(id: number, category: Category) {
+        const url = REST_API_URL + '/category/' + id;
+        return this.httpClient.put<Category>(url, category);
+    }
+
 
     deleteCategoryById(id: number) {
         const url = REST_API_URL + '/category/' + id;
@@ -203,10 +210,10 @@ export class EcommerceService {
     // -----------------------------File
 
     uploadFile(file: File) {
-        const url = REST_API_URL + '/file/uploadfile/';
+        const url = UPLOAD_API_URL ;
         const formData = new FormData();
         formData.append('file', file, file.name);
-        return this.httpClient.post<FileObj>(url, file);
+        return this.httpClient.post<FileObj>(url, formData);
     }
 
     downloadFile(url: string) {

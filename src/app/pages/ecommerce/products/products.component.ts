@@ -4,8 +4,9 @@ import {Options} from 'ng5-slider';
 import {EcommerceService} from '../../../core/services/ecommerce.service';
 import {Product} from '../../../core/models/product';
 import {ActivatedRoute, Router} from '@angular/router';
-import {AlertMessage} from '../../../core/models/alert-message';
+import {AlertMessage, TypeAlert} from '../../../core/models/alert-message';
 import {RankStarsService} from '../../../core/services/rank-stars.service';
+import {take} from 'rxjs/operators';
 
 @Component({
     selector: 'app-products',
@@ -29,8 +30,6 @@ export class ProductsComponent implements OnInit {
             return '$' + value;
         },
     };
-    typemessage: string;
-    message: string;
 
     customRatingRadioSelected = false;
 
@@ -56,6 +55,7 @@ export class ProductsComponent implements OnInit {
         maxPrice: 0
     };
     private searchedProducts: Product[];
+    alertMessage: AlertMessage;
 
 
     constructor(private ecommerceService: EcommerceService, private route: ActivatedRoute, private router: Router, private rankStarsService: RankStarsService) {
@@ -86,29 +86,33 @@ export class ProductsComponent implements OnInit {
         });
 
 
-        this.route.queryParams.subscribe(params => {
-            const typeMessage = params.typeMessage;
-            switch (typeMessage) {
-                case AlertMessage.DELETE:
-                    this.typemessage = AlertMessage.DELETE;
-                    this.message = 'Deleted Successfully';
+        this.route.queryParams.pipe(take(1)).subscribe(params => {
+            const typeAlert = params.typeAlert;
+            this.alertMessage = new AlertMessage();
+            switch (typeAlert) {
+                case TypeAlert.DELETE:
+                    this.alertMessage.message = 'Deleted Successfully';
+                    this.alertMessage.typeAlert = TypeAlert.DELETE;
                     break;
-                case AlertMessage.EDIT:
-                    this.typemessage = AlertMessage.EDIT;
-                    this.message = 'Edited Successfully';
+                case TypeAlert.EDIT:
+                    this.alertMessage.message = 'Edited Successfully';
+                    this.alertMessage.typeAlert = TypeAlert.EDIT;
                     break;
-                case AlertMessage.ADD:
-                    this.typemessage = AlertMessage.ADD;
-                    this.message = 'Added Successfully';
+                case TypeAlert.ADD:
+                    this.alertMessage.message = 'Added Successfully';
+                    this.alertMessage.typeAlert = TypeAlert.ADD;
+
                     break;
-                case AlertMessage.NONE:
-                    this.typemessage = null;
-                    this.message = '';
+                case TypeAlert.NONE:
+                    this.alertMessage = null;
+                    break;
+                default:
+                    this.alertMessage = null;
                     break;
             }
             this.clearParams();
             setTimeout(() => {
-                this.typemessage = null;
+                this.alertMessage = null;
             }, 8000);
         });
 

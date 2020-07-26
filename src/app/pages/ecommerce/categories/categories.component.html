@@ -1,7 +1,8 @@
 <div class="container-fluid">
 
-    <ngb-alert *ngIf="typemessage!=null" (close)="typemessage=null" type="{{typemessage}}" [dismissible]="true">
-        {{message}}
+    <ngb-alert *ngIf="alertMessage!=null" (close)="alertMessage=null" type="{{alertMessage.typeAlert}}"
+               [dismissible]="true">
+        {{alertMessage.message}}
     </ngb-alert>
 
     <app-page-title title="Categories" [breadcrumbItems]="breadCrumbItems"></app-page-title>
@@ -14,14 +15,17 @@
                         <div class="col-sm-4">
                             <div class="search-box mr-2 mb-2 d-inline-block">
                                 <div class="position-relative">
-                                    <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="term">
+                                    <!--<input  type="text" class="form-control" placeholder="Search..." [(ngModel)]="term">-->
+                                    <input (input)="onSearch($event.target.value)" type="text" class="form-control"
+                                           placeholder="Search...">
                                     <i class="bx bx-search-alt search-icon"></i>
                                 </div>
                             </div>
                         </div>
                         <div class="col-sm-8">
                             <div class="text-sm-right">
-                                <button type="button" class="btn btn-success btn-rounded mb-2 mr-2"><i
+                                <button (click)="isAddCategoryFormVisible=true" type="button"
+                                        class="btn btn-success btn-rounded mb-2 mr-2"><i
                                         class="mdi mdi-plus mr-1"></i>
                                     Add New Category
                                 </button>
@@ -31,75 +35,143 @@
 
                     <!-- Table data -->
                     <!--<app-transaction [transactions]="transactions |  filter:term"></app-transaction>-->
-                    <div class="table-responsive-sm mb-0">
-                        <table class="table table-centered table-nowrap">
-                            <thead class="thead-light">
-                            <tr>
-                                <th style="width: 20px;">
-                                    <div class="custom-control custom-checkbox">
-                                        <input id="customCheck" type="checkbox" class="custom-control-input"/>
-                                        <label class="custom-control-label" for="customCheck">&nbsp;</label>
-                                    </div>
-                                </th>
-                                <th>Category Name</th>
-                                <th>Category Type</th>
-                                <th>Manage</th>
-                                <th>Action</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr *ngFor="let category of categories">
-                                <td>
-                                    <div class="custom-control custom-checkbox">
-                                        <input id="customCheck{{category.id}}" type="checkbox"
-                                               class="custom-control-input"/>
-                                        <label class="custom-control-label"
-                                               for="customCheck{{category.id}}">&nbsp;</label>
-                                    </div>
-                                </td>
-                                <td>{{category.name}}</td>
-                                <!--<td>
-                          <span class="badge badge-pill badge-soft-success font-size-12" [ngClass]=" { 'badge-soft-danger': data.status === 'Chargeback',
-                                        'badge-soft-warning':data.status === 'Refund' }">{{data.status}}</span>
-                                </td>
-                                -->
-                                <td>
-                                    <span *ngIf="category.parent"
-                                          class="badge badge-pill badge-soft-success font-size-12">Parent Category</span>
-                                    <span *ngIf="!category.parent"
-                                          class="badge badge-pill badge-soft-warning font-size-12">Category</span>
-                                </td>
-                                <td>
-                                    <!-- Button trigger modal -->
-                                    <button *ngIf="category.parent" type="button"
-                                            class="mr-2 btn btn-primary btn-sm btn-rounded"
-                                            (click)="openModal(content,category)">View
-                                        Details
-                                    </button>
-                                </td>
-                                <td>
-                                    <div data-toggle="dropdown" data-boundary="window" ngbDropdown placement="bottom">
-                                        <a href="javascript: void(0);"
-                                           ngbDropdownToggle aria-expanded="false">
-                                            <i class="mdi mdi-dots-horizontal font-size-18"></i>
-                                        </a>
-                                        <ul style="overflow-x: visible;overflow-y: visible" class="dropdown-menu-right" ngbDropdownMenu>
-                                            <li><a (click)="onEditCategory(category.id)" class="dropdown-item"><i
-                                                    class="fas fa-pencil-alt text-success mr-1"></i>
-                                                Edit</a></li>
-                                            <li><a (click)="onDeleteCategory(category.id)" class="dropdown-item"><i
-                                                    class="fas fa-trash-alt text-danger mr-1"></i>
-                                                Delete</a></li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                    <form [formGroup]="formCategoryEdit">
+
+                        <div class="table-responsive-sm mb-0">
+                            <table class="table table-centered table-nowrap">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th style="width: 20px;">
+                                        <div class="custom-control custom-checkbox">
+                                            <input id="customCheck" type="checkbox" class="custom-control-input"/>
+                                            <label class="custom-control-label" for="customCheck">&nbsp;</label>
+                                        </div>
+                                    </th>
+                                    <th>Category Name</th>
+                                    <th>Category Type</th>
+                                    <th>Details</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <ng-container *ngIf="isAddCategoryFormVisible===true;">
+                                        <td></td>
+                                        <td>
+                                            <input class="form-control"
+                                                   formControlName="name"
+                                            />
+                                        </td>
+                                        <td>
+                                            <ng-select bindLabel="name"
+                                                       [items]="categoryTypes"
+                                                       formControlName="parent"
+                                                       [clearable]="false"
+                                            ></ng-select>
+                                        </td>
+                                        <td>
+                                            <!-- Button trigger modal -->
+                                        </td>
+                                        <td>
+                                            <button (click)="onAddCategory()" type="button"
+                                                    class="mr-2 btn btn-primary btn-sm btn-rounded"
+                                            >Add
+                                            </button>
+                                        </td>
+                                    </ng-container>
+                                </tr>
+                                <tr *ngFor="let category of searchedCategories;let i=index">
+                                    <!--<ng-container *ngIf="term.trim() ==='' || category.name.toLowerCase().indexOf(term)!=-1">-->
+                                    <td>
+                                        <div class="custom-control custom-checkbox">
+                                            <input id="customCheck{{category.id}}" type="checkbox"
+                                                   class="custom-control-input"/>
+                                            <label class="custom-control-label"
+                                                   for="customCheck{{category.id}}">&nbsp;</label>
+                                        </div>
+                                    </td>
+                                    <ng-container *ngIf="editCategoryId===category.id;else noCategoryEdit">
+                                        <td>
+                                            <input class="form-control"
+                                                   formControlName="name"
+                                            />
+                                        </td>
+                                        <td>
+                                            <ng-select bindLabel="name"
+                                                       [items]="categoryTypes"
+                                                       formControlName="parent"
+                                                       [clearable]="false"
+                                            ></ng-select>
+                                        </td>
+                                    </ng-container>
+                                    <ng-template #noCategoryEdit>
+                                        <td>
+                                            {{category.name}}
+                                        </td>
+                                        <td>
+                                            <span *ngIf="category.parent"
+                                                  class="badge badge-pill badge-soft-success font-size-12">Parent Category</span>
+                                            <span *ngIf="!category.parent"
+                                                  class="badge badge-pill badge-soft-warning font-size-12">Category</span>
+                                        </td>
+                                    </ng-template>
+
+                                    <!--<td>
+                              <span class="badge badge-pill badge-soft-success font-size-12" [ngClass]=" { 'badge-soft-danger': data.status === 'Chargeback',
+                                            'badge-soft-warning':data.status === 'Refund' }">{{data.status}}</span>
+                                    </td>
+                                    -->
+
+                                    <td>
+                                        <!-- Button trigger modal -->
+                                        <button *ngIf="category.parent" type="button"
+                                                class="mr-2 btn btn-success btn-sm btn-rounded"
+                                                (click)="openModal(content,category)">View
+                                            Details
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <div *ngIf="editCategoryId===category.id;else noActionButtons">
+                                            <button (click)="onSaveEditCategory(category,i)" type="button"
+                                                    class="mr-2 btn btn-primary btn-sm btn-rounded"
+                                            >Save Edit
+                                            </button>
+                                        </div>
+                                        <ng-template #noActionButtons>
+                                            <div data-toggle="dropdown" data-boundary="window" ngbDropdown
+                                                 placement="bottom">
+                                                <a href="javascript: void(0);"
+                                                   ngbDropdownToggle aria-expanded="false">
+                                                    <i class="mdi mdi-dots-horizontal font-size-18"></i>
+                                                </a>
+                                                <ul style="overflow-x: visible;overflow-y: visible"
+                                                    class="dropdown-menu-right"
+                                                    ngbDropdownMenu>
+                                                    <li><a (click)="onEditCategory(category)"
+                                                           class="dropdown-item"><i
+                                                            class="fas fa-pencil-alt text-success mr-1"></i>
+                                                        Edit</a></li>
+                                                    <li><a (click)="onDeleteCategory(category.id)"
+                                                           class="dropdown-item"><i
+                                                            class="fas fa-trash-alt text-danger mr-1"></i>
+                                                        Delete</a></li>
+                                                </ul>
+                                            </div>
+                                        </ng-template>
+
+                                    </td>
+                                    <!--</ng-container>-->
+
+                                    <!--</form>-->
+
+                                </tr>
+
+                                </tbody>
+                            </table>
 
 
-                    </div>
-
+                        </div>
+                    </form>
                     <ng-template #content role="document" let-modal>
                         <div class="modal-header">
                             <h5 class="modal-title mt-0">Details</h5>
@@ -108,79 +180,147 @@
                             </button>
                         </div>
                         <div class="container-fluid mt-2">
-                            <ngb-alert *ngIf="modalTypeMessage!=null" (close)="modalTypeMessage=null"
-                                       type="{{modalTypeMessage}}" [dismissible]="true">
-                                {{modalMessage}}
+                            <ngb-alert *ngIf="alertModalMessage!=null" (close)="alertModalMessage=null"
+                                       type="{{alertModalMessage.typeAlert}}" [dismissible]="true">
+                                {{alertModalMessage.message}}
                             </ngb-alert>
                         </div>
+                        <form [formGroup]="formSubCategoryEdit">
+                            <div class="modal-body">
+                                <div class="row mb-4">
+                                    <div class="col-md-4">
+                                        <p>
+                                            Name:
+                                            <span class="text-primary">{{modalCategory.name}}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="text-sm-right">
+                                            <button (click)="isAddSubCategoryFormVisible=true" type="button"
+                                                    class="btn btn-success btn-sm btn-rounded mb-2 mr-2"><i
+                                                    class="mdi mdi-plus mr-1"></i>
+                                                Add New Sub Category
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table *ngIf="isAddSubCategoryFormVisible;else editingSubCategory"
+                                       class="table table-centered table-nowrap">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th style="width: 20px;">
+                                            <div class="custom-control custom-checkbox">
+                                                <input id="customCheckCategory" type="checkbox"
+                                                       class="custom-control-input"/>
+                                                <label class="custom-control-label" for="customCheck">&nbsp;</label>
+                                            </div>
+                                        </th>
+                                        <th>Category Name</th>
+                                        <th>Category Type</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr *ngFor="let subCategory of subCategories;let i=index">
+                                        <td>
+                                            <div class="custom-control custom-checkbox">
+                                                <input id="customCheckCategory{{subCategory.id}}" type="checkbox"
+                                                       class="custom-control-input"/>
+                                                <label class="custom-control-label"
+                                                       for="customCheckCategory{{subCategory.id}}">&nbsp;</label>
+                                            </div>
+                                        </td>
+                                        <ng-container *ngIf="editSubCategoryId===subCategory.id;else noCategoryEdit">
 
-                        <div class="modal-body">
-                            <p class="mb-4">
-                                Name:
-                                <span class="text-primary">{{modalCategory.name}}</span>
-                            </p>
-                            <table *ngIf="modalCategory.subCategories!=null && modalCategory.subCategories.length>0;else nosubcategories"
-                                   class="table table-centered table-nowrap">
-                                <thead class="thead-light">
-                                <tr>
-                                    <th style="width: 20px;">
-                                        <div class="custom-control custom-checkbox">
-                                            <input id="customCheckCategory" type="checkbox"
-                                                   class="custom-control-input"/>
-                                            <label class="custom-control-label" for="customCheck">&nbsp;</label>
-                                        </div>
-                                    </th>
-                                    <th>Category Name</th>
-                                    <th>Category Type</th>
-                                    <th>Action</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr *ngFor="let subCategory of subCategories">
-                                    <td>
-                                        <div class="custom-control custom-checkbox">
-                                            <input id="customCheckCategory{{subCategory.id}}" type="checkbox"
-                                                   class="custom-control-input"/>
-                                            <label class="custom-control-label"
-                                                   for="customCheckCategory{{subCategory.id}}">&nbsp;</label>
-                                        </div>
-                                    </td>
-                                    <td>{{subCategory.name}}</td>
-                                    <!--<td>
-                              <span class="badge badge-pill badge-soft-success font-size-12" [ngClass]=" { 'badge-soft-danger': data.status === 'Chargeback',
-                                            'badge-soft-warning':data.status === 'Refund' }">{{data.status}}</span>
-                                    </td>
-                                    -->
-                                    <td>
-                                        <span class="badge badge-pill badge-soft-warning font-size-12">Category</span>
-                                    </td>
-                                    <td>
-                                        <div ngbDropdown placement="bottom">
-                                            <a href="javascript: void(0);"
-                                               ngbDropdownToggle aria-expanded="false">
-                                                <i class="mdi mdi-dots-horizontal font-size-18"></i>
-                                            </a>
-                                            <ul class="dropdown-menu-right" ngbDropdownMenu>
-                                                <li><a (click)="onEditSubCategory(subCategory.id)"
-                                                       class="dropdown-item"><i
-                                                        class="fas fa-pencil-alt text-success mr-1"></i>
-                                                    Edit</a></li>
-                                                <li><a (click)="onDeleteSubCategory(subCategory.id)"
-                                                       class="dropdown-item"><i
-                                                        class="fas fa-trash-alt text-danger mr-1"></i>
-                                                    Delete</a></li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                            <ng-template #nosubcategories>
-                                <ngb-alert type="warning" [dismissible]="false">
-                                    Sorry !! There is No Sub Category
-                                </ngb-alert>
-                            </ng-template>
-                        </div>
+                                            <td>
+                                                <input class="form-control"
+                                                       formControlName="name"
+                                                />
+                                            </td>
+                                        </ng-container>
+                                        <ng-template #noCategoryEdit>
+                                            <td>{{subCategory.name}}</td>
+                                        </ng-template>
+                                        <!--<td>
+                                  <span class="badge badge-pill badge-soft-success font-size-12" [ngClass]=" { 'badge-soft-danger': data.status === 'Chargeback',
+                                                'badge-soft-warning':data.status === 'Refund' }">{{data.status}}</span>
+                                        </td>
+                                        -->
+                                        <td>
+                                            <span class="badge badge-pill badge-soft-warning font-size-12">Category</span>
+                                        </td>
+                                        <td>
+                                            <div *ngIf="editSubCategoryId===subCategory.id;else noSubActionButtons">
+                                                <button (click)="onSaveEditSubCategory(subCategory,i)" type="button"
+                                                        class="mr-2 btn btn-primary btn-sm btn-rounded"
+                                                >Save Edit
+                                                </button>
+                                            </div>
+                                            <ng-template #noSubActionButtons>
+                                                <div ngbDropdown placement="bottom">
+                                                    <a href="javascript: void(0);"
+                                                       ngbDropdownToggle aria-expanded="false">
+                                                        <i class="mdi mdi-dots-horizontal font-size-18"></i>
+                                                    </a>
+                                                    <ul class="dropdown-menu-right" ngbDropdownMenu>
+                                                        <li><a (click)="onEditSubCategory(subCategory)"
+                                                               class="dropdown-item"><i
+                                                                class="fas fa-pencil-alt text-success mr-1"></i>
+                                                            Edit</a></li>
+                                                        <li><a (click)="onDeleteSubCategory(subCategory.id)"
+                                                               class="dropdown-item"><i
+                                                                class="fas fa-trash-alt text-danger mr-1"></i>
+                                                            Delete</a></li>
+                                                    </ul>
+                                                </div>
+                                            </ng-template>
+
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <ng-template #editingSubCategory>
+                                    <table *ngIf="subCategories!=null && subCategories.length>0;else nosubcategories"
+                                           class="table table-centered table-nowrap">
+                                        <thead class="thead-light">
+                                        <tr>
+                                            <th style="width: 20px;">
+
+                                            </th>
+                                            <th>Category Name</th>
+                                            <th>Category Type</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>
+                                            </td>
+                                            <td>
+                                                <input class="form-control"
+                                                       formControlName="name"
+                                                />
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-pill badge-soft-warning font-size-12">Category</span>
+                                            </td>
+                                            <td>
+                                                <button (click)="onAddSubCategory()" type="button"
+                                                        class="mr-2 btn btn-primary btn-sm btn-rounded"
+                                                >Add
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <ng-template #nosubcategories>
+                                        <ngb-alert type="warning" [dismissible]="false">
+                                            Sorry !! There is No Sub Category
+                                        </ngb-alert>
+                                    </ng-template>
+                                </ng-template>
+                            </div>
+                        </form>
                         <div class="modal-footer">
                             <button class="btn btn-secondary" (click)="onModalClose()">Close</button>
                         </div>
@@ -193,21 +333,15 @@
                                 <i class="mdi mdi-chevron-left"></i>
                             </a>
                         </li>
-                        <li class="page-item active">
-                            <a class="page-link" href="javascript: void(0);">1</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="javascript: void(0);">2</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="javascript: void(0);">3</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="javascript: void(0);">4</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="javascript: void(0);">5</a>
-                        </li>
+                        <ng-container *ngFor="let pager of pagers;let i=index">
+                            <li *ngIf="i==0" class="page-item active">
+                                <a class="page-link" href="javascript: void(0);">{{i+1}}</a>
+                            </li>
+                            <li *ngIf="i!=0" class="page-item">
+                                <a class="page-link" href="javascript: void(0);">{{i+1}}</a>
+                            </li>
+                        </ng-container>
+
                         <li class="page-item">
                             <a class="page-link" href="javascript: void(0);" aria-label="Next">
                                 <i class="mdi mdi-chevron-right"></i>

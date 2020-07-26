@@ -15,4 +15,6 @@ export const environment = {
 //export const REST_API_URL = 'http://localhost:8090/ecomflutter';
 export const REST_API_URL = 'https://ecomflutter.herokuapp.com/ecomflutter';
 export const UPLOAD_API_URL = 'https://am1ne.com/upload';
+export const MAX_IMAGE_UPLOAD = 8;
+
 

@@ -23,11 +23,12 @@ import {OrdersComponent} from './orders/orders.component';
 import {UPLOAD_API_URL} from '../../../environments/environment';
 import {CategoriesComponent} from './categories/categories.component';
 import {NgxDropzoneModule} from 'ngx-dropzone';
+import {MAX_IMAGE_UPLOAD} from '../../../environments/environment.prod';
 
 const config: DropzoneConfigInterface = {
     // Change this to your upload POST address:
     url: UPLOAD_API_URL,
-    maxFilesize: 8,
+    maxFilesize: MAX_IMAGE_UPLOAD,
     acceptedFiles: 'image/jpeg,image/png,image/gif',
     timeout: 180000,
     addRemoveLinks: true,
