@@ -8,7 +8,7 @@
     <app-page-title title="Categories" [breadcrumbItems]="breadCrumbItems"></app-page-title>
 
     <div class="row">
-        <div class="col-6">
+        <div class="col-12">
             <div class="card">
                 <div class="card-body">
                     <div class="row mb-2">
@@ -24,7 +24,7 @@
                         </div>
                         <div class="col-sm-8">
                             <div class="text-sm-right">
-                                <button (click)="isAddCategoryFormVisible=true" type="button"
+                                <button (click)="isAddCategoryFormVisible=true; editCategoryId=-1" type="button"
                                         class="btn btn-success btn-rounded mb-2 mr-2"><i
                                         class="mdi mdi-plus mr-1"></i>
                                     Add New Category
@@ -60,22 +60,39 @@
                                         <td>
                                             <input class="form-control"
                                                    formControlName="name"
+                                                   placeholder="Enter category name"
+                                                   [ngClass]="{ 'is-invalid': fceSubmitted && fce.name.errors }"
+
                                             />
                                         </td>
                                         <td>
-                                            <ng-select bindLabel="name"
+                                            <ng-select class="categoriesCustom" bindLabel="name"
                                                        [items]="categoryTypes"
                                                        formControlName="parent"
                                                        [clearable]="false"
+                                                       placeholder="Select category type"
+                                                       (change)="onChangeCategoryType()"
+                                                       [ngClass]="{ 'invalid': fceSubmitted && fce.parent.errors }"
                                             ></ng-select>
                                         </td>
                                         <td>
-                                            <!-- Button trigger modal -->
+                                            <ng-select *ngIf="isCategorySelected" class="categoriesCustom"
+                                                       bindLabel="name"
+                                                       [items]="parentCategories"
+                                                       formControlName="parentCategory"
+                                                       [clearable]="true"
+                                                       placeholder="Select parent category"
+                                                       [ngClass]="{ 'invalid': fceSubmitted && fce.parentCategory.errors }"
+                                            ></ng-select>
                                         </td>
                                         <td>
                                             <button (click)="onAddCategory()" type="button"
                                                     class="mr-2 btn btn-primary btn-sm btn-rounded"
                                             >Add
+                                            </button>
+                                            <button (click)="onCancelCategory()" type="button"
+                                                    class="btn btn-secondary  btn-sm btn-rounded"
+                                            >Cancel
                                             </button>
                                         </td>
                                     </ng-container>
@@ -94,6 +111,7 @@
                                         <td>
                                             <input class="form-control"
                                                    formControlName="name"
+                                                   [ngClass]="{ 'is-invalid': fceSubmitted && fce.name.errors }"
                                             />
                                         </td>
                                         <td>
@@ -101,6 +119,8 @@
                                                        [items]="categoryTypes"
                                                        formControlName="parent"
                                                        [clearable]="false"
+                                                       (change)="onChangeCategoryType(true)"
+                                                       [ngClass]="{ 'is-invalid': fceSubmitted && fce.parent.errors }"
                                             ></ng-select>
                                         </td>
                                     </ng-container>
@@ -118,23 +138,46 @@
 
                                     <!--<td>
                               <span class="badge badge-pill badge-soft-success font-size-12" [ngClass]=" { 'badge-soft-danger': data.status === 'Chargeback',
-                                            'badge-soft-warning':data.status === 'Refund' }">{{data.status}}</span>
+                                            'badge-soft-warning':data.status === 'Refund' }">{{data.staftus}}</span>
                                     </td>
                                     -->
 
                                     <td>
                                         <!-- Button trigger modal -->
-                                        <button *ngIf="category.parent" type="button"
-                                                class="mr-2 btn btn-success btn-sm btn-rounded"
-                                                (click)="openModal(content,category)">View
-                                            Details
-                                        </button>
+                                        <div *ngIf="editCategoryId===category.id;else noEditCategory">
+                                            <ng-select
+                                                    *ngIf="isEditCategorySelected"
+                                                    class="categoriesCustom"
+                                                    bindLabel="name"
+                                                    [items]="parentCategories"
+                                                    formControlName="parentCategory"
+                                                    [clearable]="true"
+                                                    placeholder="Select parent category"
+                                                    [ngClass]="{ 'invalid': fceSubmitted && fce.parentCategory.errors }"
+                                            ></ng-select>
+                                        </div>
+                                        <ng-template #noEditCategory>
+                                            <button *ngIf="category.parent" type="button"
+                                                    class="mr-2 btn btn-success btn-sm btn-rounded"
+                                                    (click)="openModal(content,category)">View
+                                                Details
+                                            </button>
+                                            <div *ngIf="!category.parent && category.parentCategory!=null">
+                                                <span class="mr-2 badge badge-pill badge-soft-success font-size-12">Parent</span>
+                                                {{category.parentCategory.name}}
+                                            </div>
+                                        </ng-template>
+
                                     </td>
                                     <td>
                                         <div *ngIf="editCategoryId===category.id;else noActionButtons">
                                             <button (click)="onSaveEditCategory(category,i)" type="button"
                                                     class="mr-2 btn btn-primary btn-sm btn-rounded"
-                                            >Save Edit
+                                            >Save
+                                            </button>
+                                            <button (click)="onCancelCategory()" type="button"
+                                                    class="btn btn-secondary btn-sm btn-rounded"
+                                            >Cancel
                                             </button>
                                         </div>
                                         <ng-template #noActionButtons>
@@ -194,7 +237,7 @@
                                             <span class="text-primary">{{modalCategory.name}}</span>
                                         </p>
                                     </div>
-                                    <div class="col-md-8">
+                                    <!--<div class="col-md-8">
                                         <div class="text-sm-right">
                                             <button (click)="isAddSubCategoryFormVisible=true" type="button"
                                                     class="btn btn-success btn-sm btn-rounded mb-2 mr-2"><i
@@ -202,10 +245,10 @@
                                                 Add New Sub Category
                                             </button>
                                         </div>
-                                    </div>
+                                    </div>-->
                                 </div>
-                                <table *ngIf="isAddSubCategoryFormVisible;else editingSubCategory"
-                                       class="table table-centered table-nowrap">
+                                <table *ngIf="subCategories!=null && subCategories.length>0;else nosubcategories"
+                                        class="table table-centered table-nowrap">
                                     <thead class="thead-light">
                                     <tr>
                                         <th style="width: 20px;">
@@ -235,6 +278,7 @@
                                             <td>
                                                 <input class="form-control"
                                                        formControlName="name"
+                                                       [ngClass]="{ 'is-invalid': fsceSubmitted && fsce.name.errors }"
                                                 />
                                             </td>
                                         </ng-container>
@@ -279,46 +323,12 @@
                                     </tr>
                                     </tbody>
                                 </table>
-                                <ng-template #editingSubCategory>
-                                    <table *ngIf="subCategories!=null && subCategories.length>0;else nosubcategories"
-                                           class="table table-centered table-nowrap">
-                                        <thead class="thead-light">
-                                        <tr>
-                                            <th style="width: 20px;">
-
-                                            </th>
-                                            <th>Category Name</th>
-                                            <th>Category Type</th>
-                                            <th>Action</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <tr>
-                                            <td>
-                                            </td>
-                                            <td>
-                                                <input class="form-control"
-                                                       formControlName="name"
-                                                />
-                                            </td>
-                                            <td>
-                                                <span class="badge badge-pill badge-soft-warning font-size-12">Category</span>
-                                            </td>
-                                            <td>
-                                                <button (click)="onAddSubCategory()" type="button"
-                                                        class="mr-2 btn btn-primary btn-sm btn-rounded"
-                                                >Add
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                    <ng-template #nosubcategories>
-                                        <ngb-alert type="warning" [dismissible]="false">
-                                            Sorry !! There is No Sub Category
-                                        </ngb-alert>
-                                    </ng-template>
+                                <ng-template #nosubcategories>
+                                    <ngb-alert type="warning" [dismissible]="false">
+                                        Sorry !! There is No Sub Category
+                                    </ngb-alert>
                                 </ng-template>
+
                             </div>
                         </form>
                         <div class="modal-footer">

@@ -120,24 +120,42 @@
 }
 
 //productdetail category
-.ng-select.custom-ng-select {
-  &.no-disable {
-    .ng-select-container {
-      .ng-value-container {
-        .ng-value {
-          background-color: $primary;
-          border-color: $primary;
+.ng-select {
+  &.custom-ng-select {
+    &.no-disable {
+      .ng-select-container {
+        .ng-value-container {
+          .ng-value {
+            background-color: $primary;
+            border-color: $primary;
+          }
         }
-      }
-      .ng-arrow-wrapper {
-        display: none;
+        .ng-arrow-wrapper {
+          display: none;
+        }
       }
     }
   }
+  &.categoriesCustom {
+    &.invalid {
+      border-color: $red;
+      border: solid 1px;
+      border-radius: 0.25rem;
+      box-sizing: border-box;
 
+      .ng-select-container {
+        border: solid 0px;
+        .ng-value-container {
+          .ng-value {
+
+          }
+        }
+      }
+    }
+  }
 }
 
-.ng-select.custom {
+/*.ng-select.custom {
   .ng-select-container {
     .ng-value-container {
       .ng-value {
@@ -149,5 +167,5 @@
       display: none;
     }
   }
-}
+}*/
 

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {EcommerceService} from '../../../core/services/ecommerce.service';
 import {Router} from '@angular/router';
@@ -9,7 +9,8 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 @Component({
     selector: 'app-categories',
     templateUrl: './categories.component.html',
-    styleUrls: ['./categories.component.scss']
+    styleUrls: ['./categories.component.scss'],
+    encapsulation: ViewEncapsulation.None
 })
 
 /**
@@ -26,12 +27,16 @@ export class CategoriesComponent implements OnInit {
     alertMessage: AlertMessage;
     alertModalMessage: AlertMessage;
     subCategories: Category[];
+    parentCategories: Category[];
     modalCategory: Category;
     editCategoryId = -1;
     editSubCategoryId = -1;
     formCategoryEdit: FormGroup;
     formSubCategoryEdit: FormGroup;
     isAddCategoryFormVisible = false;
+    fceSubmitted = false;
+    fsceSubmitted = false;
+
     categoryTypes = [
         {
             name: 'Parent Category',
@@ -49,6 +54,9 @@ export class CategoriesComponent implements OnInit {
     };
     private NUMBER_ITEMS_PER_PAGE = 2;
     isAddSubCategoryFormVisible = false;
+    isCategorySelected = false;
+    isEditCategorySelected = false;
+    isCategoryModal = false;
 
 
     constructor(private modalService: NgbModal, private ecommerceService: EcommerceService, private router: Router) {
@@ -82,7 +90,8 @@ export class CategoriesComponent implements OnInit {
 
         this.formCategoryEdit = new FormGroup({
             name: new FormControl(null, [Validators.required]),
-            parent: new FormControl(this.categoryType, [Validators.required])
+            parent: new FormControl(null, [Validators.required]),
+            parentCategory: new FormControl(null, null)
         });
         this.formSubCategoryEdit = new FormGroup({
             name: new FormControl(null, [Validators.required]),
@@ -97,12 +106,16 @@ export class CategoriesComponent implements OnInit {
     openModal(content: any, category: Category) {
         this.modalCategory = category;
         this.subCategories = [];
+        this.isCategoryModal = false;
         if (this.modalCategory.parent) {
-            this.ecommerceService.findCategoryById(this.modalCategory.id).subscribe(categoryRes => {
-                this.subCategories = categoryRes.subCategories;
+            this.ecommerceService.findAllCategoriesByParentCategoryId(this.modalCategory.id).subscribe(subCategories => {
+                this.subCategories = subCategories;
                 this.modalService.open(content, {centered: true});
                 console.log(this.subCategories);
             });
+        } else {
+            this.isCategoryModal = true;
+            this.modalService.open(content, {centered: true});
         }
     }
 
@@ -133,10 +146,20 @@ export class CategoriesComponent implements OnInit {
         }
         this.editCategoryId = category.id;
 
-        this.formCategoryEdit.setValue({
+        this.formCategoryEdit.patchValue({
             name: category.name,
             parent: this.categoryType
         });
+
+        if (!category.parent) {
+            this.parentCategories = this.searchedCategories.filter(category1 => category1.parent === true);
+            if (category.parentCategory != null) {
+                this.formCategoryEdit.patchValue({
+                    parentCategory: category.parentCategory
+                });
+            }
+            this.isEditCategorySelected = true;
+        }
     }
 
     onEditSubCategory(category: Category) {
@@ -171,37 +194,73 @@ export class CategoriesComponent implements OnInit {
     onModalClose() {
         this.modalService.dismissAll();
         this.alertModalMessage = null;
+        this.formSubCategoryEditReset();
     }
 
     onSaveEditCategory(category: Category, index: number) {
-        const editedCatgoryName = this.fce.name.value;
-        const editedCatgoryType: {
-            name: string,
-            parent: boolean
-        } = this.fce.parent.value;
-        const editedCategoryIsParent = editedCatgoryType.parent;
+        this.fceSubmitted = true;
+        if (this.formCategoryEdit.valid) {
+            this.fceSubmitted = false;
+            const editedCatgoryName = this.fce.name.value;
+            const editedCatgoryType: {
+                name: string,
+                parent: boolean
+            } = this.fce.parent.value;
+            const editedCategoryIsParent = editedCatgoryType.parent;
+            const editedCategoryParent = this.fce.parentCategory.value;
+
+            category.name = editedCatgoryName;
+            category.parent = editedCategoryIsParent;
+            if (editedCategoryParent != null) {
+                category.parentCategory = editedCategoryParent;
+            } else {
+                category.parentCategory = null;
+            }
+
+            this.ecommerceService.updateCategory(category.id, category).subscribe(category1 => {
+                this.categories[index] = category1;
+
+                this.formCategoryEditReset();
+            });
 
 
-        category.name = editedCatgoryName;
-        category.parent = editedCategoryIsParent;
+        }
 
-        this.ecommerceService.updateCategory(category.id, category).subscribe(category1 => {
-            this.categories[index] = category1;
-            this.editCategoryId = -1;
-        });
+    }
+
+    private formCategoryEditReset() {
+        this.editCategoryId = -1;
+        this.formCategoryEdit.reset();
+        // for Edit
+        this.isEditCategorySelected = false;
+        // for Add
+        this.isCategorySelected = false;
+        this.isAddCategoryFormVisible = false;
+    }
+
+    private formSubCategoryEditReset() {
+        this.editSubCategoryId = -1;
+        this.formSubCategoryEdit.reset();
     }
 
     onSaveEditSubCategory(subCategory: Category, index: number) {
-        const editedCatgoryName = this.fsce.name.value;
+        this.fsceSubmitted = true;
+        if (this.formSubCategoryEdit.valid) {
+            this.fsceSubmitted = false;
+            const editedCatgoryName = this.fsce.name.value;
 
 
-        subCategory.name = editedCatgoryName;
+            subCategory.name = editedCatgoryName;
 
-        this.ecommerceService.updateCategory(subCategory.id, subCategory).subscribe(category => {
-            this.categories[index] = category;
-            this.searchedCategories = this.categories.slice();
-            this.editSubCategoryId = -1;
-        });
+
+            this.ecommerceService.updateCategory(subCategory.id, subCategory).subscribe(category => {
+                this.categories[index] = category;
+                this.searchedCategories = this.categories.slice();
+                this.formSubCategoryEditReset();
+            });
+
+
+        }
     }
 
     onSearch(searchedText: string) {
@@ -230,30 +289,73 @@ export class CategoriesComponent implements OnInit {
     }
 
     onAddCategory() {
-        const newCatgoryName = this.fce.name.value;
-        const newCatgoryType: {
-            name: string,
-            parent: boolean
-        } = this.fce.parent.value;
-        const newCategoryIsParent = newCatgoryType.parent;
+        this.fceSubmitted = true;
+
+        console.log('bjoj', this.fceSubmitted, this.fce.parent.errors);
+        if (this.formCategoryEdit.valid) {
+            this.fceSubmitted = false;
+
+            const newCatgoryName = this.fce.name.value;
+            const newCatgoryType: {
+                name: string,
+                parent: boolean
+            } = this.fce.parent.value;
+            const newCategoryIsParent = newCatgoryType.parent;
+            const newCategoryParent: Category = this.fce.parentCategory.value;
 
 
-        const category = new Category();
-        category.name = newCatgoryName;
-        category.parent = newCategoryIsParent;
-
-        this.ecommerceService.addCategory(category).subscribe(categoryRes => {
-            if (categoryRes != null) {
-                this.categories.unshift(categoryRes);
-                this.searchedCategories = this.categories.slice();
-                this.isAddCategoryFormVisible = false;
+            const category = new Category();
+            category.name = newCatgoryName;
+            category.parent = newCategoryIsParent;
+            if (newCategoryParent != null) {
+                category.parentCategory = newCategoryParent;
+            } else {
+                category.parentCategory = null;
             }
-        });
 
-        this.formCategoryEdit.reset();
+            this.ecommerceService.addCategory(category).subscribe(categoryRes => {
+                if (categoryRes != null) {
+                    this.categories.unshift(categoryRes);
+                    this.searchedCategories = this.categories.slice();
+                    this.formCategoryEditReset();
+                }
+            });
+        }
+
     }
 
     onAddSubCategory() {
 
     }
+
+    onCancelCategory() {
+        this.formCategoryEditReset();
+
+    }
+
+
+    onChangeCategoryType(isEdit?: boolean) {
+        const catgoryType: {
+            name: string,
+            parent: boolean
+        } = this.fce.parent.value;
+
+        if (isEdit) {
+            this.isEditCategorySelected = false;
+        } else {
+            this.isCategorySelected = false;
+        }
+
+
+        if (!catgoryType.parent) {
+            if (isEdit) {
+                this.isEditCategorySelected = true;
+            } else {
+                this.isCategorySelected = true;
+            }
+            this.parentCategories = this.searchedCategories.filter(category => category.parent === true);
+        }
+    }
+
+
 }

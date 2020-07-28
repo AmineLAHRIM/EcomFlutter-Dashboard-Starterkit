@@ -5,7 +5,7 @@ export class Category {
     name: string;
     deleted: boolean;
     parent: boolean;
-    subCategories: Category[];
+    parentCategory: Category;
 
     products: Product[];
 }
