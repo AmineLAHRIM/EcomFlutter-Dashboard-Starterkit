@@ -236,10 +236,13 @@ export class CategoriesComponent implements OnInit {
         // for Add
         this.isCategorySelected = false;
         this.isAddCategoryFormVisible = false;
+
+        this.fceSubmitted = false;
     }
 
     private formSubCategoryEditReset() {
         this.editSubCategoryId = -1;
+        this.fsceSubmitted = false;
         this.formSubCategoryEdit.reset();
     }
 
@@ -330,7 +333,10 @@ export class CategoriesComponent implements OnInit {
 
     onCancelCategory() {
         this.formCategoryEditReset();
+    }
 
+    onCancelSubCategory(){
+        this.formSubCategoryEditReset();
     }
 
 

@@ -14,7 +14,7 @@ import {NgSelectModule} from '@ng-select/ng-select';
 
 import {ProductsComponent} from './products/products.component';
 import {ProductdetailComponent} from './productdetail/productdetail.component';
-import {ShopsComponent} from './shops/shops.component';
+import {StoresComponent} from './stores/stores.component';
 import {CheckoutComponent} from './checkout/checkout.component';
 import {CartComponent} from './cart/cart.component';
 import {AddproductComponent} from './addproduct/addproduct.component';
@@ -40,7 +40,7 @@ const config: DropzoneConfigInterface = {
     declarations: [
         ProductsComponent,
         ProductdetailComponent,
-        ShopsComponent,
+        StoresComponent,
         CheckoutComponent,
         CartComponent,
         AddproductComponent,
