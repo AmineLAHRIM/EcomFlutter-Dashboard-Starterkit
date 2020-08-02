@@ -72,7 +72,7 @@
                                                        [clearable]="false"
                                                        placeholder="Select category type"
                                                        (change)="onChangeCategoryType()"
-                                                       [ngClass]="{ 'invalid': fceSubmitted && fce.parent.errors }"
+                                                       [ngClass]="{ 'is-invalid': fceSubmitted && fce.parent.errors }"
                                             ></ng-select>
                                         </td>
                                         <td>
@@ -82,7 +82,7 @@
                                                        formControlName="parentCategory"
                                                        [clearable]="true"
                                                        placeholder="Select parent category"
-                                                       [ngClass]="{ 'invalid': fceSubmitted && fce.parentCategory.errors }"
+                                                       [ngClass]="{ 'is-invalid': fceSubmitted && fce.parentCategory.errors }"
                                             ></ng-select>
                                         </td>
                                         <td>
@@ -153,7 +153,7 @@
                                                     formControlName="parentCategory"
                                                     [clearable]="true"
                                                     placeholder="Select parent category"
-                                                    [ngClass]="{ 'invalid': fceSubmitted && fce.parentCategory.errors }"
+                                                    [ngClass]="{ 'is-invalid': fceSubmitted && fce.parentCategory.errors }"
                                             ></ng-select>
                                         </div>
                                         <ng-template #noEditCategory>

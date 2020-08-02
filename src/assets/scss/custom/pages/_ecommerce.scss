@@ -137,16 +137,17 @@
     }
   }
   &.categoriesCustom {
-    &.invalid {
+    &.is-invalid {
       .ng-select-container {
         border-color: $red !important;
         box-sizing: border-box;
         border-radius: 0.25rem;
         transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        .ng-value-container {
-          .ng-value {
+      }
 
-          }
+      &.ng-select-focused{
+        .ng-select-container{
+          box-shadow: 0 0 0 0.15rem rgba(244, 106, 106, 0.25);
         }
       }
     }
