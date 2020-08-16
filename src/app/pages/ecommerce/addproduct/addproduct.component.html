@@ -7,7 +7,8 @@
         </div>
     </div>
     <!-- start page title -->
-    <app-page-title title="Add Product" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+    <app-page-title *ngIf="!isEditMode" title="Add Product" [breadcrumbItems]="breadCrumbItems"></app-page-title>
+    <app-page-title *ngIf="isEditMode" title="Edit Product" [breadcrumbItems]="breadCrumbItems"></app-page-title>
     <!-- end page title -->
 
     <div class="row">
@@ -116,7 +117,7 @@
                                     <label class="control-label">Store</label>
                                     <ng-select bindLabel="name"
                                                [items]="stores | async"
-
+                                               formControlName="store"
                                                (change)="onChangeStore()"
                                                [ngClass]="{ 'is-invalid': fpsubmitted && fp.store.errors }"
 
@@ -197,7 +198,8 @@
                             </div>
                         </div>
                         <div class="row d-flex">
-                            <div (click)="onClickProductImage(productImage)" *ngFor="let productImage of productImages;let i=index" class="col-2 mb-2">
+                            <div (click)="onClickProductImage(productImage)"
+                                 *ngFor="let productImage of productImages;let i=index" class="col-2 mb-2">
                                 <div (mouseleave)="hoverdIndex=-1" (mouseenter)="onProductHover(i)"
                                      class="row justify-content-center product-img">
                                     <div class="avatar-sm product-ribbon">
@@ -211,13 +213,14 @@
                                 <!--<div class="row justify-content-center mt-2">
                                     <div class="badge badge-pill badge-soft-danger font-size-12">Delete</div>
                                 </div>-->
-                                <div class="row justify-content-center mt-2">
+                                <div *ngIf="featuredImage!=null" class="row justify-content-center mt-2">
                                     <div *ngIf="productImage.id===featuredImage.id; else notfeautre"
                                          class="btn badge badge-pill badge-soft-success font-size-12">
                                         Featured Image
                                     </div>
-                                    <ng-template #notfeautre >
-                                        <div *ngIf="hoverdIndex===i" class="btn badge badge-pill badge-soft-success font-size-12">
+                                    <ng-template #notfeautre>
+                                        <div *ngIf="hoverdIndex===i"
+                                             class="btn badge badge-pill badge-soft-success font-size-12">
                                             Featured Image
                                         </div>
 

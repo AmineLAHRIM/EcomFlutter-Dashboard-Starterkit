@@ -23,7 +23,7 @@ initFirebaseBackend(environment.firebaseConfig);
         LayoutsModule,
         HttpClientModule,
         AppRoutingModule,
-        ExtrapagesModule
+        ExtrapagesModule,
     ],
     bootstrap: [AppComponent],
 })

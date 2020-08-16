@@ -16,7 +16,6 @@
     "@angular/common": "~9.0.0",
     "@angular/compiler": "~9.0.0",
     "@angular/core": "~9.0.0",
-    "@angular/fire": "^5.4.2",
     "@angular/forms": "~9.0.0",
     "@angular/localize": "^9.0.0",
     "@angular/platform-browser": "~9.0.0",
@@ -64,12 +63,12 @@
     "randomstring": "^1.1.5",
     "rxjs": "~6.5.4",
     "sass-loader": "^8.0.2",
-    "sweetalert2": "^9.7.1",
+    "sweetalert2": "^9.17.1",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.901.7",
+    "@angular-devkit/build-angular": "^0.1000.6",
     "@angular/cli": "~9.0.1",
     "@angular/compiler-cli": "~9.0.0",
     "@angular/language-service": "~9.0.0",

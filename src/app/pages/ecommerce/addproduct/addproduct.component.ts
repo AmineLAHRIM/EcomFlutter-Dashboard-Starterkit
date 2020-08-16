@@ -19,11 +19,30 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {NgxDropzoneChangeEvent} from 'ngx-dropzone';
 import {MAX_IMAGE_UPLOAD} from '../../../../environments/environment.prod';
 import {AlertMessage, TypeAlert} from '../../../core/models/alert-message';
+import {UPLOAD_API_URL} from '../../../../environments/environment';
+import {DROPZONE_CONFIG, DropzoneConfigInterface} from 'ngx-dropzone-wrapper';
+
+
+const config: DropzoneConfigInterface = {
+    // Change this to your upload POST address:
+    url: UPLOAD_API_URL,
+    maxFilesize: MAX_IMAGE_UPLOAD,
+    acceptedFiles: 'image/jpeg,image/png,image/gif',
+    timeout: 180000,
+    addRemoveLinks: true,
+    dictRemoveFile: ''
+};
 
 @Component({
     selector: 'app-addproduct',
     templateUrl: './addproduct.component.html',
-    styleUrls: ['./addproduct.component.scss']
+    styleUrls: ['./addproduct.component.scss'],
+    providers: [
+        {
+            provide: DROPZONE_CONFIG,
+            useValue: config
+        }
+    ]
 })
 
 /**
@@ -145,6 +164,7 @@ export class AddproductComponent implements OnInit {
             this.product.price = this.fp.price.value;
             this.product.shippingPrice = this.fp.shippingPrice.value;
             this.product.unit = this.fp.unit.value;
+            console.log('save store', this.fp.store.value);
             this.product.store = this.fp.store.value;
             this.product.upsells = this.fp.upsell.value;
             console.log('cat value', this.fp.category.value);
@@ -253,9 +273,10 @@ export class AddproductComponent implements OnInit {
             if (user != null) {
                 this.user = user;
                 console.log('user id', this.user.id);
-                this.ecommerceService.findAllSellerByUserId(user.id).subscribe(seller => {
+                this.ecommerceService.findSellerByUserId(user.id).subscribe(seller => {
                     this.ecommerceService.findAllStoresBySellerId(seller.id).subscribe(stores => {
                         console.log('seller id', seller.id);
+                        console.log('stores', stores);
                         this.stores.next(stores);
                     });
                 });
@@ -322,9 +343,11 @@ export class AddproductComponent implements OnInit {
         this.upsells.next([]);
 
         this.ecommerceService.findAllProductByStoreId(this.selectedStore?.id).subscribe(res => {
-            if (res.output != null) {
+            const productsResult: Product[] = res.output;
+
+            if (productsResult != null && productsResult.length > 0) {
                 const upsells = [];
-                (res.output as Product[]).forEach(product => {
+                productsResult.forEach(product => {
                     const upsell: Upsell = new Upsell();
                     upsell.upsellProduct = product;
                     upsells.push(upsell);
@@ -358,9 +381,9 @@ export class AddproductComponent implements OnInit {
         this.isSaveProductImages = false;
         const file: FileObj = args[1];
         this.handleUploadImage(file.imageUrl);
-        setTimeout(() => {
+        /*setTimeout(() => {
             args = null;
-        }, 2000);
+        }, 2000);*/
         console.log('onUploadSuccess:', args);
     }
 
@@ -503,7 +526,12 @@ export class AddproductComponent implements OnInit {
     }
 
     onClickProductImage(productImage: ProductImage) {
+        this.productImages.forEach(value => {
+            console.log('id', value.id);
+        });
         this.featuredImage = productImage;
+        console.log('featuredImage', this.featuredImage.id);
+
         this.isSaveProductImages = false;
         this.isNoFeaturedImage = false;
     }

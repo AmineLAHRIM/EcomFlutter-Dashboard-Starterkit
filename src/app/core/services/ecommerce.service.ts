@@ -153,8 +153,14 @@ export class EcommerceService {
 
     addStore(store: Store) {
         const url = REST_API_URL + '/store/';
-        return this.httpClient.post<number>(url, store);
+        return this.httpClient.post<Store>(url, store);
     }
+
+    updateStore(id: number, store: Store) {
+        const url = REST_API_URL + '/store/' + id;
+        return this.httpClient.put<Store>(url, store);
+    }
+
 
     findAllStores() {
         const url = REST_API_URL + '/store/';
@@ -193,7 +199,7 @@ export class EcommerceService {
         return this.httpClient.get<Seller>(url);
     }
 
-    findAllSellerByUserId(id: number) {
+    findSellerByUserId(id: number) {
         const url = REST_API_URL + '/seller/user/' + id;
         return this.httpClient.get<Seller>(url);
     }
@@ -210,7 +216,7 @@ export class EcommerceService {
     // -----------------------------File
 
     uploadFile(file: File) {
-        const url = UPLOAD_API_URL ;
+        const url = UPLOAD_API_URL;
         const formData = new FormData();
         formData.append('file', file, file.name);
         return this.httpClient.post<FileObj>(url, formData);

@@ -9,7 +9,7 @@ import {WidgetModule} from '../../shared/widget/widget.module';
 import {Ng5SliderModule} from 'ng5-slider';
 import {Ng2SearchPipeModule} from 'ng2-search-filter';
 import {NgbAlertModule, NgbDropdownModule, NgbNavModule, NgbPaginationModule} from '@ng-bootstrap/ng-bootstrap';
-import {DROPZONE_CONFIG, DropzoneConfigInterface, DropzoneModule} from 'ngx-dropzone-wrapper';
+import { DropzoneModule} from 'ngx-dropzone-wrapper';
 import {NgSelectModule} from '@ng-select/ng-select';
 
 import {ProductsComponent} from './products/products.component';
@@ -20,20 +20,10 @@ import {CartComponent} from './cart/cart.component';
 import {AddproductComponent} from './addproduct/addproduct.component';
 import {CustomersComponent} from './customers/customers.component';
 import {OrdersComponent} from './orders/orders.component';
-import {UPLOAD_API_URL} from '../../../environments/environment';
 import {CategoriesComponent} from './categories/categories.component';
 import {NgxDropzoneModule} from 'ngx-dropzone';
-import {MAX_IMAGE_UPLOAD} from '../../../environments/environment.prod';
 
-const config: DropzoneConfigInterface = {
-    // Change this to your upload POST address:
-    url: UPLOAD_API_URL,
-    maxFilesize: MAX_IMAGE_UPLOAD,
-    acceptedFiles: 'image/jpeg,image/png,image/gif',
-    timeout: 180000,
-    addRemoveLinks: true,
-    dictRemoveFile: ''
-};
+
 
 @NgModule({
     // tslint:disable-next-line: max-line-length
@@ -64,12 +54,6 @@ const config: DropzoneConfigInterface = {
         NgbAlertModule,
         ReactiveFormsModule,
         NgxDropzoneModule
-    ],
-    providers: [
-        {
-            provide: DROPZONE_CONFIG,
-            useValue: config
-        }
     ]
 })
 export class EcommerceModule {

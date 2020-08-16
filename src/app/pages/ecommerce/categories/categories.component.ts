@@ -127,7 +127,6 @@ export class CategoriesComponent implements OnInit {
                 this.alertMessage.typeAlert = TypeAlert.DELETE;
                 this.alertMessage.message = 'Category Deleted Successfully';
                 const index = this.categories.findIndex(category => category.id === id);
-                console.log('index', index);
                 this.categories.splice(index, 1);
                 this.searchedCategories = this.categories.slice();
                 setTimeout(() => {
