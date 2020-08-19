@@ -17,6 +17,10 @@ const routes: Routes = [
         path: 'products',
         component: ProductsComponent,
         resolve: [ProductsResolverService]
+    }, {
+        path: 'products/:storeId',
+        component: ProductsComponent,
+        resolve: [ProductsResolverService]
     },
     {
         path: 'product/:id',

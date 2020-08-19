@@ -120,7 +120,6 @@ export class CategoriesComponent implements OnInit {
     }
 
     onDeleteCategory(id: number) {
-        console.log('onDeleteCategory', id);
         this.ecommerceService.deleteCategoryById(id).subscribe(value => {
             if (value > 0) {
                 this.alertMessage = new AlertMessage();

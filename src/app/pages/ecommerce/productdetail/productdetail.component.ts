@@ -3,11 +3,12 @@ import {ActivatedRoute, Params, Router} from '@angular/router';
 import {Product} from '../../../core/models/product';
 import {Subject, Subscription} from 'rxjs';
 import {ProductImage} from '../../../core/models/product-image';
-import {AlertMessage, TypeAlert} from '../../../core/models/alert-message';
+import {TypeAlert} from '../../../core/models/alert-message';
 import {Category} from '../../../core/models/category';
 import {Upsell} from '../../../core/models/upsell';
 import {EcommerceService} from '../../../core/services/ecommerce.service';
 import {RankStarsService} from '../../../core/services/rank-stars.service';
+import {RoutingStateService} from '../../../core/services/routing-state.service';
 
 @Component({
     selector: 'app-productdetail',
@@ -29,6 +30,7 @@ export class ProductdetailComponent implements OnInit, OnDestroy {
     relativeUpsells: Upsell[] = [];
 
     categories = new Subject<Category[]>();
+    private previousUrl: string;
 
     selectedCategories = [];
 
@@ -36,14 +38,15 @@ export class ProductdetailComponent implements OnInit, OnDestroy {
     private sub: Subscription;
 
 
-    constructor(private route: ActivatedRoute, private router: Router, private ecommerceService: EcommerceService, private rankStarsService: RankStarsService) {
+    constructor(private route: ActivatedRoute, private router: Router, private ecommerceService: EcommerceService, private rankStarsService: RankStarsService, private routingStateService: RoutingStateService) {
     }
 
     ngOnInit() {
+        this.previousUrl = this.routingStateService.getPreviousUrl();
+
 
         this.sub = this.route.params.subscribe((params: Params) => {
             this.id = +params.id;
-            console.log('hada id=', this.id);
             // after confirm
             this.setupSub();
 
@@ -58,9 +61,7 @@ export class ProductdetailComponent implements OnInit, OnDestroy {
     setupSub() {
         this.sub = this.ecommerceService.findProduct(this.id).subscribe(res => {
             if (res.output != null) {
-                console.log('before hahoma category', this.selectedCategories);
                 this.product = new Product();
-                console.log('fullName', this.product);
 
                 this.product = res.output as Product;
                 this.relativeUpsells = this.product.upsells.slice(0, 3);
@@ -71,14 +72,12 @@ export class ProductdetailComponent implements OnInit, OnDestroy {
                 this.selectedCategories = this.product.categories;
                 if (this.product.productImages != null) {
                     this.productImages = this.product.productImages;
-                    console.log('hada product images=', this.productImages);
 
                 }
 
                 // setup rank
                 this.rankStarsService.setupRank(this.product);
 
-                console.log('hada product=', this.product);
             }
         }, error1 => {
             this.errors = error1;
@@ -103,7 +102,6 @@ export class ProductdetailComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.subs.forEach(sub => {
-            console.log('unsubscribe');
             sub.unsubscribe();
         });
     }
@@ -112,7 +110,7 @@ export class ProductdetailComponent implements OnInit, OnDestroy {
         if (this.product != null) {
             this.ecommerceService.deleteProductById(this.product.id).subscribe(value => {
                 if (value >= 0) {
-                    this.router.navigate(['/ecommerce/products'], {queryParams: {typeAlert: TypeAlert.DELETE}});
+                    this.router.navigate([this.previousUrl], {queryParams: {typeAlert: TypeAlert.DELETE}});
                 }
             });
         }

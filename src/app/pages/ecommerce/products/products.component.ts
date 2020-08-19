@@ -56,12 +56,13 @@ export class ProductsComponent implements OnInit {
     };
     private searchedProducts: Product[];
     alertMessage: AlertMessage;
-
+    private storeId: number;
 
     constructor(private ecommerceService: EcommerceService, private route: ActivatedRoute, private router: Router, private rankStarsService: RankStarsService) {
     }
 
     ngOnInit() {
+
         this.breadCrumbItems = [{label: 'Ecommerce'}, {label: 'Product', active: true}];
         // because data already fetched on reslover before ngOnInit
         // and we can subscribe then fetch data
@@ -71,19 +72,36 @@ export class ProductsComponent implements OnInit {
             this.filtredProducts = this.products.slice();
         });
 
-        this.ecommerceService.findMaxMinPrice().subscribe(price => {
-            if (price != null) {
-                this.productFilters.maxPrice = price.maxPrice;
-                this.productFilters.minPrice = price.minPrice;
-                this.priceoption = {
-                    floor: price.minPrice,
-                    ceil: price.maxPrice,
-                    translate: (value: number): string => {
-                        return '$' + value;
-                    }
-                };
-            }
-        });
+        this.storeId = this.route.snapshot.params.storeId;
+        if (this.storeId != null) {
+            this.ecommerceService.findMaxMinPriceByStoreId(this.storeId).subscribe(price => {
+                if (price != null) {
+                    this.productFilters.maxPrice = price.maxPrice;
+                    this.productFilters.minPrice = price.minPrice;
+                    this.priceoption = {
+                        floor: price.minPrice,
+                        ceil: price.maxPrice,
+                        translate: (value: number): string => {
+                            return '$' + value;
+                        }
+                    };
+                }
+            });
+        } else {
+            this.ecommerceService.findMaxMinPrice().subscribe(price => {
+                if (price != null) {
+                    this.productFilters.maxPrice = price.maxPrice;
+                    this.productFilters.minPrice = price.minPrice;
+                    this.priceoption = {
+                        floor: price.minPrice,
+                        ceil: price.maxPrice,
+                        translate: (value: number): string => {
+                            return '$' + value;
+                        }
+                    };
+                }
+            });
+        }
 
 
         this.route.queryParams.pipe(take(1)).subscribe(params => {
@@ -138,14 +156,16 @@ export class ProductsComponent implements OnInit {
     }
 
     private setupFilter() {
-        console.log('setupFilter');
 
         this.filtredProducts = this.products.filter(product => {
 
             // filter price min max
             if (this.productFilters.minPrice !== this.priceoption.floor || this.productFilters.maxPrice !== this.priceoption.ceil) {
-                console.log('filter price min max' + this.productFilters.minPrice + this.productFilters.maxPrice);
-                if (product.price >= this.productFilters.minPrice && product.price <= this.productFilters.maxPrice) {
+                let currentProductPrice = product.price;
+                if (product.pricePromo !== 0 && product.pricePromo < product.price) {
+                    currentProductPrice = product.pricePromo;
+                }
+                if (currentProductPrice >= this.productFilters.minPrice && currentProductPrice <= this.productFilters.maxPrice) {
 
                 } else {
                     return null;
@@ -155,7 +175,7 @@ export class ProductsComponent implements OnInit {
 
             // filter rating
             if (this.productFilters.rating > -1) {
-                const currentRating = product.rankStars.numbers.length;
+                const currentRating = product.rankStars?.numbers.length;
                 if (this.productFilters.rating + 1 === RankStarsService.NUMBER_STARS) {
                     if (currentRating >= this.productFilters.rating && currentRating <= this.productFilters.rating + 1) {
                     } else {
@@ -250,7 +270,6 @@ export class ProductsComponent implements OnInit {
 
     onSearch(searchedText: string) {
 
-        console.log('onSearch', this.searchedProducts);
         // if there is no filter before
         if (this.searchedProducts == null || this.searchedProducts.length === 0) {
             this.searchedProducts = this.products.slice();

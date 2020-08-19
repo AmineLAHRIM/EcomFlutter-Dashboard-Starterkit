@@ -38,10 +38,8 @@ export class AuthService {
     autologout(expirationDate: number) {
         const timeOutSeconds = (expirationDate - Date.now());
         //const timeOutSeconds = 10000;
-        console.log('timeOutSeconds', timeOutSeconds, this.tokenExpirationTimer);
         if (!this.tokenExpirationTimer) {
             this.tokenExpirationTimer = setTimeout(() => {
-                console.log('logout');
                 this.logout();
             }, timeOutSeconds);
         }

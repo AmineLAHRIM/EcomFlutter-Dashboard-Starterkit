@@ -1,5 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthService} from './core/services/auth.service';
+import {RoutingStateService} from './core/services/routing-state.service';
 
 @Component({
     selector: 'app-root',
@@ -8,7 +9,8 @@ import {AuthService} from './core/services/auth.service';
 })
 export class AppComponent implements OnInit {
 
-    constructor(private authService: AuthService) {
+    constructor(private authService: AuthService, private routingStateService: RoutingStateService) {
+        this.routingStateService.loadRouting();
     }
 
     ngOnInit(): void {

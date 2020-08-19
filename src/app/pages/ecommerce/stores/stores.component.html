@@ -65,7 +65,7 @@
                             </div>
                             <div class="row mt-4">
                                 <div class="col-md-6">
-                                    <a href="javascript: void(0);">View Details</a>
+                                    <a [routerLink]="['/ecommerce/products',store.id]">View Products</a>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="float-right" data-toggle="dropdown" data-boundary="window" ngbDropdown
@@ -163,7 +163,8 @@
                             <ng-container *ngIf="logoImageUrl!=null">
                                 <button type="button" class="btn btn-outline-danger btn-rounded"
                                         (click)="onRemoveLogoImage()"
-                                >Remove</button>
+                                >Remove
+                                </button>
                             </ng-container>
                         </div>
 
@@ -220,7 +221,8 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" [disabled]="formStore.dirty || imageChanged ? false : true" class="btn btn-primary mr-1">Save
+                    <button type="submit" [disabled]="formStore.dirty || imageChanged ? false : true"
+                            class="btn btn-primary mr-1">Save
                         Changes
                     </button>
                     <button class="btn btn-secondary" (click)="onModalClose()">Close</button>

@@ -74,6 +74,11 @@ export class EcommerceService {
         return this.httpClient.get<{ maxPrice: number, minPrice: number }>(url);
     }
 
+    findMaxMinPriceByStoreId(storeId: number) {
+        const url = REST_API_URL + '/product/maxminprice/store/' + storeId;
+        return this.httpClient.get<{ maxPrice: number, minPrice: number }>(url);
+    }
+
     // -----------------------------Product Images
 
     findAllProductImagesByProductId(id: number) {
@@ -144,7 +149,6 @@ export class EcommerceService {
 
     deleteCategoryById(id: number) {
         const url = REST_API_URL + '/category/' + id;
-        console.log('deleteCategoryById', url);
         return this.httpClient.delete<number>(url);
     }
 
@@ -224,7 +228,6 @@ export class EcommerceService {
 
     downloadFile(url: string) {
         return this.httpClient.get<ArrayBuffer>(url).pipe(tap(x => {
-            console.log('x', x);
         }));
     }
 
@@ -232,7 +235,6 @@ export class EcommerceService {
 
     private handleError(errorRes: HttpErrorResponse) {
         let errorMessages: Message[];
-        console.log('ERROR', errorRes.error);
         if (errorRes.error != null) {
             errorMessages = [];
             const errorResponse: Response = errorRes.error;

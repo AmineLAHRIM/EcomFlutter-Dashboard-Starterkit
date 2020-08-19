@@ -32,6 +32,11 @@ export class UserRestService {
         );
     }
 
+    updateUser(id: number, user: User) {
+        const url = REST_API_URL + '/user/' + id;
+        return this.httpClient.put<Response>(url, user);
+    }
+
     save(user: User) {
         return this.httpClient.post<Response>(REST_API_URL + '/user/', user);
     }

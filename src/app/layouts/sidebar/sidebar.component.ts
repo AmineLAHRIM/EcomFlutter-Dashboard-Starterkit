@@ -42,7 +42,6 @@ export class SidebarComponent implements OnInit, AfterViewInit, OnChanges {
     }
 
     ngAfterViewInit() {
-        console.log('sidemenu', this.sideMenu);
         this.menu = new MetisMenu(this.sideMenu.nativeElement);
 
     }

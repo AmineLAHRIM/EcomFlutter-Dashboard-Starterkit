@@ -6,6 +6,8 @@ export class User {
     public phoneNumber?: string;
     public address?: string;
     public token: string;
+    public firstname: string;
+    public lastname: string;
     public username: string;
     public email: string;
     public password: string;

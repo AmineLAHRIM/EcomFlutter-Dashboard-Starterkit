@@ -16,6 +16,19 @@ export class ProductsResolverService implements Resolve<Product[]> {
 
     resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Product[]> | Promise<Product[]> | Product[] {
         // automatique subscriped to it
+        const storeId = route.params.storeId;
+        if (storeId != null) {
+            return this.ecommerceService.findAllProductByStoreId(storeId).pipe(map(res => {
+                    const products = res.output;
+                    products.map(product => {
+                        this.rankStarsService.setupRank(product);
+                    });
+                    return products;
+                }),
+                tap(products => {
+                    this.ecommerceService.productsChanged.next(products);
+                }));
+        }
         return this.ecommerceService.findAllProducts().pipe(map(products => {
                 products.map(product => {
                     this.rankStarsService.setupRank(product);
