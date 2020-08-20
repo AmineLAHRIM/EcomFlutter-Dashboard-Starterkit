@@ -10,6 +10,10 @@ import {ProfileComponent} from './profile/profile.component';
 import {UIModule} from '../shared/ui/ui.module';
 import {NgbAlertModule} from '@ng-bootstrap/ng-bootstrap';
 import {ReactiveFormsModule} from '@angular/forms';
+import { PasswordComponent } from './profile/password/password.component';
+import {NgxDropzoneModule} from 'ngx-dropzone';
+import { DropzoneModule} from 'ngx-dropzone-wrapper';
+
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     suppressScrollX: true,
@@ -17,14 +21,15 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
 };
 
 @NgModule({
-    declarations: [BlankpageComponent, ProfileComponent],
+    declarations: [BlankpageComponent, ProfileComponent, PasswordComponent],
     imports: [
         CommonModule,
         PagesRoutingModule,
         PerfectScrollbarModule,
         UIModule,
         NgbAlertModule,
-        ReactiveFormsModule
+        DropzoneModule,
+        ReactiveFormsModule,
     ],
     providers: [
         {
