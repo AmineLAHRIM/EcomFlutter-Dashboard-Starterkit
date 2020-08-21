@@ -60,7 +60,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
         this.authService.login(this.f.email.value, this.f.password.value, this.f.rememberme.value).subscribe(res => {
             if (res.succes) {
                 this.errors = [];
-                this.router.navigate(['/default']);
+                this.router.navigate(['/ecommerce/products']);
             }
         }, errorMessages => {
             this.errors = errorMessages;

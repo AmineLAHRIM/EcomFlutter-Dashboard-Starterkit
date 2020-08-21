@@ -151,6 +151,8 @@ export class StoresComponent implements OnInit {
 
     onAddStore() {
         this.fssubmitted = true;
+        this.formStore.reset(this.formStore.value);
+
         if (this.formStore.valid) {
             const store = new Store();
             store.name = this.fs.name.value;

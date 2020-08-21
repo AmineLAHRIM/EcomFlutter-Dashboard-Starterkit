@@ -28,8 +28,12 @@ export class AuthService {
     autoLogin() {
         const user: User = JSON.parse(localStorage.getItem('userData'));
         if (user) {
+            this.userRestService.findById(user.id).subscribe(newUser => {
+                if (newUser != null) {
+                    this.userService.userSubject.next(newUser);
+                }
+            });
             //if (user.token) {
-            this.userService.userSubject.next(user);
             //this.autologout(user.expirationDate.getTime());
             //}
         }
@@ -93,7 +97,7 @@ export class AuthService {
      * Logout the user
      */
     logout() {
-
+        localStorage.removeItem('userData');
     }
 
 
