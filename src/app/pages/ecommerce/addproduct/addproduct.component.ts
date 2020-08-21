@@ -50,6 +50,7 @@ const config: DropzoneConfigInterface = {
  */
 export class AddproductComponent implements OnInit {
     hoverdIndex = -1;
+    clickedIndex = -1;
     featuredImage: ProductImage;
     private isNoFeaturedImage = false;
 
@@ -455,16 +456,21 @@ export class AddproductComponent implements OnInit {
         if (productImage.id === this.featuredImage.id) {
             this.isNoFeaturedImage = true;
         }
+
+        if (this.productImages.length <= 0) {
+            this.featuredImage.imageUrl = '';
+        }
     }
 
     onSaveProductImages() {
+        this.errorsProductImages = [];
 
         if (this.productImages.length > MAX_IMAGE_UPLOAD) {
             const alertMessage = new AlertMessage();
             alertMessage.message = 'MAX IMAGES IS ' + MAX_IMAGE_UPLOAD;
             alertMessage.typeAlert = TypeAlert.DELETE;
             this.errorsProductImages.push(alertMessage);
-        } else if (this.isNoFeaturedImage) {
+        } else if (this.isNoFeaturedImage && this.productImages.length > 0) {
             const alertMessage = new AlertMessage();
             alertMessage.message = 'PLEASE SELECT FEATURED IMAGE ';
             alertMessage.typeAlert = TypeAlert.EDIT;
@@ -479,9 +485,12 @@ export class AddproductComponent implements OnInit {
                 this.product.featuredImage = this.featuredImage;
                 this.ecommerceService.addProduct(this.product).subscribe(res => {
                     if (res.output != null) {
+                        console.log('output', res.output);
                         this.product = res.output;
                         this.id = this.product.id;
                         this.isEditMode = true;
+                        this.productImagesOriginal = this.product.productImages.slice();
+
                     }
                 });
             } else {
@@ -489,11 +498,14 @@ export class AddproductComponent implements OnInit {
                 this.product.featuredImage = this.featuredImage;
                 this.ecommerceService.updateProduct(this.id, this.product).subscribe(res => {
                     if (res.output != null) {
+                        console.log('output', res.output);
                         this.product = res.output;
+                        this.productImagesOriginal = this.product.productImages.slice();
+
                     }
                 });
             }
-            this.productImagesOriginal = this.product.productImages.slice();
+            console.log('productImagesOriginal', this.productImagesOriginal);
         }
 
     }
@@ -525,12 +537,15 @@ export class AddproductComponent implements OnInit {
         this.hoverdIndex = index;
     }
 
-    onClickProductImage(productImage: ProductImage) {
-        this.productImages.forEach(value => {
-            console.log('id', value.id);
-        });
+    onClickProductImage(productImage: ProductImage, index: number) {
+
         this.featuredImage = productImage;
-        console.log('featuredImage', this.featuredImage.id);
+        if (this.featuredImage.id === undefined) {
+            console.log('featuredImage', index);
+        } else {
+            console.log('featuredImage', this.featuredImage.id);
+        }
+        this.clickedIndex = index;
 
         this.isSaveProductImages = false;
         this.isNoFeaturedImage = false;

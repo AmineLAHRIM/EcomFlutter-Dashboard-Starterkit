@@ -198,35 +198,59 @@
                             </div>
                         </div>
                         <div class="row d-flex">
-                            <div (click)="onClickProductImage(productImage)"
-                                 *ngFor="let productImage of productImages;let i=index" class="col-2 mb-2">
-                                <div (mouseleave)="hoverdIndex=-1" (mouseenter)="onProductHover(i)"
-                                     class="row justify-content-center product-img">
-                                    <div class="avatar-sm product-ribbon">
-                                        <div (click)="onDeleteProductImage(productImage)"
-                                             class="btn badge badge-pill badge-soft-danger font-size-12">×
-                                        </div>
-                                    </div>
-
-                                    <img class="rounded" src="{{productImage.imageUrl}}" height="140" alt=""/>
-                                </div>
-                                <!--<div class="row justify-content-center mt-2">
-                                    <div class="badge badge-pill badge-soft-danger font-size-12">Delete</div>
-                                </div>-->
-                                <div *ngIf="featuredImage!=null" class="row justify-content-center mt-2">
-                                    <div *ngIf="productImage.id===featuredImage.id; else notfeautre"
-                                         class="btn badge badge-pill badge-soft-success font-size-12">
-                                        Featured Image
-                                    </div>
-                                    <ng-template #notfeautre>
-                                        <div *ngIf="hoverdIndex===i"
-                                             class="btn badge badge-pill badge-soft-success font-size-12">
-                                            Featured Image
+                                <div  (click)="onClickProductImage(productImage,i)"
+                                      *ngFor="let productImage of productImages;let i=index" class="col-2 mb-2">
+                                    <div (mouseleave)="hoverdIndex=-1" (mouseenter)="onProductHover(i)"
+                                         class="row justify-content-center product-img">
+                                        <div class="avatar-sm product-ribbon">
+                                            <div (click)="onDeleteProductImage(productImage)"
+                                                 class="btn badge badge-pill badge-soft-danger font-size-12">×
+                                            </div>
                                         </div>
 
+                                        <img class="rounded" src="{{productImage.imageUrl}}" height="140" alt=""/>
+                                    </div>
+                                    <!--<div class="row justify-content-center mt-2">
+                                        <div class="badge badge-pill badge-soft-danger font-size-12">Delete</div>
+                                    </div>-->
+                                    <div *ngIf="featuredImage!=null;else nofeaturedimage" class="row justify-content-center mt-2">
+                                        <div *ngIf="featuredImage.id===undefined || featuredImage.id==null;else alreadyHaveImages">
+                                            <div *ngIf="i===clickedIndex; else notfeautre"
+                                                 class="btn badge badge-pill badge-soft-success font-size-12">
+                                                Featured Image
+                                            </div>
+                                            <ng-template #notfeautre>
+                                                <div *ngIf="hoverdIndex===i"
+                                                     class="btn badge badge-pill badge-soft-success font-size-12">
+                                                    Featured Image
+                                                </div>
+
+                                            </ng-template>
+                                        </div>
+                                        <ng-template #alreadyHaveImages>
+                                            <div *ngIf="productImage.id===featuredImage.id; else notfeautre"
+                                                 class="btn badge badge-pill badge-soft-success font-size-12">
+                                                Featured Image
+                                            </div>
+                                            <ng-template #notfeautre>
+                                                <div *ngIf="hoverdIndex===i"
+                                                     class="btn badge badge-pill badge-soft-success font-size-12">
+                                                    Featured Image
+                                                </div>
+
+                                            </ng-template>
+                                        </ng-template>
+
+                                    </div>
+                                    <ng-template #nofeaturedimage>
+                                        <div class="row justify-content-center mt-2">
+                                            <div *ngIf="hoverdIndex===i"
+                                                 class="btn badge badge-pill badge-soft-success font-size-12">
+                                                Featured Image
+                                            </div>
+                                        </div>
                                     </ng-template>
                                 </div>
-                            </div>
                         </div>
                         <div class="mt-2">
                             <button type="button" [disabled]="isSaveProductImages" (click)="onSaveProductImages()"
